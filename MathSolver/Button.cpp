@@ -22,7 +22,7 @@ void Button::Update(sf::RenderWindow& window)
 	if (InsideSprite(mousePos)) {
 		sprite.setColor(sf::Color(150, 150, 150));
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-			if (!isClicked) {
+			if (!isClicked && !disabled) {
 				onClick();
 			}
 			isClicked = true;

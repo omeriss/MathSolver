@@ -18,22 +18,31 @@
 #include "Graph.h"
 #include "DragBar.h"
 #include "Client.h"
+#include "DrawScreen.h"
+#include "Meeting.h"
 
 class UiManager
 {
 public:
-	static UiManager* instance;
-	UiManager();
+	static UiManager* GetInstance();
 	void UpdateSfmlEvents();
 	void Init();
 	void InitScreens();
 	void Start();
 	void Update();
+	Meeting* GetMeeting();
+	std::map<std::string, Screen*>& GetScreens();
 	Client cl;
 private:
+	UiManager();
+	static UiManager* instance;
+	UiManager(UiManager& other) = delete;
+	void operator=(const UiManager&) = delete;
+	Meeting* meeting;
 	std::map<std::string,Screen*> screens;
 	sf::RenderWindow* window;
 	sf::Font baseFont;
 	sf::Vector2u lastWindowSize;
+	
 };
 

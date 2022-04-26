@@ -11,7 +11,6 @@ asio::ip::tcp::socket& TCP::GetSocket()
 
 TCP::~TCP()
 {
-	
 }
 
 void TCP::ReadPacket()
@@ -31,18 +30,18 @@ void TCP::ReadPacket()
 					temp->Resize(temp->GetHeader().size);
 					asio::async_read(socket, asio::buffer(temp->GetData(), temp->GetHeader().size),
 						[temp, this](std::error_code errorCode, int len) {
-						if (errorCode) {
-							socket.close();
-							Packet* disconnectPacket = new Packet();
-							disconnectPacket->GetHeader().packetType = 0;
-							socket.remote_endpoint().address();
-							PacketExecutor::GetInstance()->HandlePacket(id, disconnectPacket);
-							delete temp;
-						}
-						else {
-							PacketExecutor::GetInstance()->HandlePacket(id, temp);
-							ReadPacket();
-						}
+							if (errorCode) {
+								socket.close();
+								Packet* disconnectPacket = new Packet();
+								disconnectPacket->GetHeader().packetType = 0;
+								socket.remote_endpoint().address();
+								PacketExecutor::GetInstance()->HandlePacket(id, disconnectPacket);
+								delete temp;
+							}
+							else {
+								PacketExecutor::GetInstance()->HandlePacket(id, temp);
+								ReadPacket();
+							}
 						});
 				}
 				else {
@@ -53,14 +52,13 @@ void TCP::ReadPacket()
 		});
 }
 
-void TCP::Send(Packet& packet)
+void TCP::Send(std::shared_ptr<Packet> packet)
 {
 	service.post(SendStrand.wrap([this, packet]() {
 		bool notWriting = sendQueue.empty();
 		sendQueue.push(packet);
 		if (notWriting) {
-			Write(
-			);
+			Write();
 		}
 		}));
 }
@@ -78,7 +76,7 @@ uint32_t TCP::GetId()
 
 void TCP::Disconnect()
 {
-	if (!socket.is_open())
+	if (socket.is_open())
 		socket.close();
 }
 
@@ -86,10 +84,10 @@ void TCP::Write()
 {
 	if (sendQueue.empty())
 		return;
-	Packet& tempPacket = sendQueue.front();
-	vector<asio::mutable_buffers_1> tempVec = { asio::buffer(&tempPacket.GetHeader(), sizeof(Header)) };
-	if (tempPacket.GetHeader().size)
-		tempVec.push_back(asio::buffer(tempPacket.GetData(), tempPacket.GetHeader().size));
+	std::shared_ptr<Packet> tempPacket = sendQueue.front();
+	vector<asio::mutable_buffers_1> tempVec = { asio::buffer(&tempPacket->GetHeader(), sizeof(Header)) };
+	if (tempPacket->GetHeader().size)
+		tempVec.push_back(asio::buffer(tempPacket->GetData(), tempPacket->GetHeader().size));
 	asio::async_write(socket, tempVec, [this](std::error_code errorCode, int len) {
 		if (errorCode) {
 			std::cout << "cant Write" << std::endl;

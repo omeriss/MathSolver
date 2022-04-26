@@ -150,9 +150,10 @@
   <ItemGroup>
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Client.cpp" />
+    <ClCompile Include="DrawScreen.cpp" />
     <ClCompile Include="TCP.cpp" />
     <ClCompile Include="DragBar.cpp" />
-    <ClCompile Include="DrawScreen.cpp" />
+    <ClCompile Include="Meeting.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="HandlePacketFunctions.cpp" />
     <ClCompile Include="Image.cpp" />
@@ -168,10 +169,11 @@
   <ItemGroup>
     <ClInclude Include="Button.h" />
     <ClInclude Include="Client.h" />
+    <ClInclude Include="DrawScreen.h" />
     <ClInclude Include="TCP.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="DragBar.h" />
-    <ClInclude Include="DrawScreen.h" />
+    <ClInclude Include="Meeting.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="HandlePacketFunctions.h" />
     <ClInclude Include="Image.h" />

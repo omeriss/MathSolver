@@ -5,7 +5,7 @@ Client::Client()
 	service.stop();
 }
 
-bool Client::Connect(std::string& ip, int16_t port)
+bool Client::Connect(std::string& ip, int16_t port, std::string roomCode)
 {
 	try {
 		std::cout << service.stopped() << std::endl;
@@ -21,15 +21,18 @@ bool Client::Connect(std::string& ip, int16_t port)
 		asio::ip::basic_resolver<asio::ip::udp> rU(service);
 		auto endpointUdp = rU.resolve(ip, std::to_string(port));
 
-
 		asio::async_connect(tcp->GetSocket() , endpoint,
-			[endpointUdp, this](std::error_code ec, asio::ip::tcp::endpoint endpoint)
+			[roomCode ,endpointUdp, this](std::error_code ec, asio::ip::tcp::endpoint endpoint)
 			{
 				if (!ec)
 				{
+					UDP::socket = new asio::ip::udp::socket(service, asio::ip::udp::endpoint(asio::ip::udp::v4(), tcp->GetSocket().local_endpoint().port()));
+					udp = new UDP(service, endpointUdp->endpoint());
 
-					UdpScocket = new asio::ip::udp::socket(service, asio::ip::udp::endpoint(asio::ip::udp::v4(), tcp->GetSocket().local_endpoint().port()));
-					udp = new UDP(service, UdpScocket, endpointUdp->endpoint());
+					std::shared_ptr<Packet> pingPacket = std::make_shared<Packet>();
+					(*pingPacket) << roomCode;
+					pingPacket->GetHeader().packetType = RoomRequest;
+					tcp->Send(std::move(pingPacket));
 
 					tcp->ReadPacket();
 					udp->ReadPacket();
@@ -46,27 +49,33 @@ bool Client::Connect(std::string& ip, int16_t port)
 	}
 	catch (std::exception& exp){
 		std::cout << "Eror:" << exp.what() << std::endl;
+		service.stop();
+		if (tcp)
+			delete tcp;
+		tcp = nullptr;
 		return false;
 	}
 }
 
-void Client::SendUdp(Packet& packet)
+void Client::SendUdp(std::shared_ptr<Packet> packet)
 {
 	if (udp && tcp && tcp->GetSocket().is_open())
-		udp->Send(packet);
+		udp->Send(std::move(packet));
 }
 
-void Client::SendTcp(Packet& packet)
+void Client::SendTcp(std::shared_ptr<Packet> packet)
 {
 	if (tcp && tcp->GetSocket().is_open())
-		tcp->Send(packet);
+		tcp->Send(std::move(packet));
 }
 
 
 void Client::Disconnect()
 {
-	udp->Disconnect();
 	tcp->Disconnect();
+	service.stop();
 	delete tcp;
 	delete udp;
+	udp = nullptr;
+	tcp = nullptr;
 }

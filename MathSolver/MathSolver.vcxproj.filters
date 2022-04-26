@@ -72,6 +72,9 @@
     <ClCompile Include="Screen.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="Meeting.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
     <ClCompile Include="DrawScreen.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
@@ -120,6 +123,9 @@
       <Filter>Header Files\networking</Filter>
     </ClInclude>
     <ClInclude Include="Screen.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Meeting.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="DrawScreen.h">

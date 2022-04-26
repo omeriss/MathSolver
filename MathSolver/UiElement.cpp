@@ -43,9 +43,19 @@ void UiElement::SetOrigin(OriginType origin)
 	}
 }
 
+void UiElement::SetPosition(sf::Vector2f position)
+{
+	sprite.setPosition(position);
+}
+
+sf::Vector2f UiElement::GetPosition()
+{
+	return sprite.getPosition();
+}
+
 bool UiElement::InsideSprite(sf::Vector2f pos)
 {
-	return pos.x >= sprite.getPosition().x - sprite.getOrigin().x * sprite.getScale().x && pos.y >= sprite.getPosition().y - sprite.getOrigin().y * sprite.getScale().y
+	return MouseInScreen && pos.x >= sprite.getPosition().x - sprite.getOrigin().x * sprite.getScale().x && pos.y >= sprite.getPosition().y - sprite.getOrigin().y * sprite.getScale().y
 		&& pos.x <= sprite.getPosition().x - sprite.getOrigin().x * sprite.getScale().x + sprite.getGlobalBounds().width
 		&& pos.y <= sprite.getPosition().y - sprite.getOrigin().y * sprite.getScale().y + sprite.getGlobalBounds().height;
 }

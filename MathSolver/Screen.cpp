@@ -21,7 +21,7 @@ Screen::Screen(int w, int h, sf::FloatRect port, sf::RenderWindow* window, Scree
 
 void Screen::ReScale(int width, int height, int lastWidth, int lastHeight)
 {
-	float scale = view.getSize().y * 1.0 / height;
+	float scale = (screenType == ScaleByWith)? view.getSize().x * 1.0 / width :view.getSize().y * 1.0 / height;
 	sf::FloatRect portCords;
 	printf("%d %d\n", this->winodw->getSize().x, this->winodw->getSize().y);
 	switch (screenType)
@@ -45,6 +45,9 @@ void Screen::ReScale(int width, int height, int lastWidth, int lastHeight)
 		view.setViewport({ portCords.left / width, portCords.top / height,
 			portCords.width * (1.0f*height/lastHeight) / width, portCords.height * ((1.0f * height / lastHeight)) / height });
 		break;
+	case ScaleByWith:
+		view.setSize(view.getSize().x, height * scale);
+		view.setCenter(view.getCenter().x, height * scale / 2); // pin the screen to left
 	default:
 		break;
 	}
@@ -53,6 +56,11 @@ void Screen::ReScale(int width, int height, int lastWidth, int lastHeight)
 void Screen::AddElement(UiElement* element)
 {
 	elements.push_back(element);
+}
+
+void Screen::RemoveElement(UiElement* element)
+{
+	elements.erase(std::remove(elements.begin(), elements.end(), element), elements.end());
 }
 
 void Screen::UdpateScreen()
@@ -64,10 +72,12 @@ void Screen::UdpateScreen()
 	for (auto e : elements) {
 		e->Update(*winodw);
 	}
+
 }
 
 void Screen::DrawScreen()
 {
+
 	if (!isActive)
 		return;
 

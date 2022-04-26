@@ -7,12 +7,12 @@ using std::vector;
 typedef unsigned char Byte;
 typedef int32_t EnumType;
 
-enum PacketsServer :EnumType {
-	DisconnectFromServer, Ping, Audiop
+enum PacketsClient :EnumType {
+	DisconnectFromServer, RoomRequest, Audiop, SendLine, SendCell
 };
 
-enum PacketsClient :EnumType {
-	OnClientDisconnect, PingBack, Audios
+enum PacketsServer :EnumType {
+	OnClientDisconnect, RoomResponse, Audios, SetLinePacket, SetCellPacket, UserConnected, UserDisconnect
 };
 
 struct Header {
@@ -29,6 +29,13 @@ public:
 	void Resize(int len);
 	Byte* GetData();
 	template<typename InsertType>
+	Packet& WriteArr(InsertType* insertData, size_t len) {
+		header.size = data.size() + sizeof(InsertType) * len;
+		data.resize(header.size);
+		std::memcpy(data.data() + (header.size - sizeof(InsertType) * len), insertData, sizeof(InsertType) * len);
+		return *this;
+	}
+	template<typename InsertType>
 	friend Packet& operator <<(Packet& packet, InsertType insertData) {
 		packet.header.size = packet.data.size() + sizeof(InsertType);
 		packet.data.resize(packet.header.size);
@@ -42,6 +49,12 @@ public:
 		return packet;
 	}
 	template<typename readType>
+	Packet& ReadArr(readType* ReadData, size_t len) {
+		std::memcpy(ReadData, data.data() + readFrom, sizeof(readType) * len);
+		readFrom += sizeof(readType) * len;
+		return *this;
+	}
+	template<typename readType>
 	friend Packet& operator >>(Packet& packet, readType& ReadData) {
 		std::memcpy(&ReadData, packet.data.data() + packet.readFrom, sizeof(readType));
 		packet.readFrom += sizeof(readType);
@@ -50,7 +63,7 @@ public:
 	friend Packet& operator >>(Packet& packet, std::string& ReadData) {
 		ReadData = "";
 		int i = 0;
-		while (packet.readFrom < packet.header.size && packet.data.data()[packet.readFrom]){
+		while (packet.readFrom < packet.header.size && packet.data.data()[packet.readFrom]) {
 			ReadData += packet.data.data()[packet.readFrom++];
 		}
 		packet.readFrom++;

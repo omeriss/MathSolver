@@ -30,15 +30,18 @@ static std::map<std::string, sf::Texture*>* LoadTextures(std::string dirPath) {
     return textureMap;
 }
 std::map<std::string, sf::Texture*>& UiElement::textureMap = *LoadTextures(SPRITE_PATH);
+bool UiElement::MouseInScreen = false;
+int UiElement::MouseWheelDelta = 0;
 UiManager* UiManager::instance = new UiManager();
 PacketExecutor* PacketExecutor::instance;
+asio::ip::udp::socket* UDP::socket = NULL;
+UdpReadData UDP::readData;
 #pragma endregion
 
 
 
 int main(){
-
     PacketExecutor::GetInstance()->SetFunctions(CreatePacketVector);
-    UiManager::instance->Start();
+    UiManager::GetInstance()->Start();
     return 0;
 }

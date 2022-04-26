@@ -14,5 +14,6 @@ private:
     sf::Text text;
     std::function<void()> onClick;
     bool isClicked;
+    std::atomic_bool disabled;
 };
 
