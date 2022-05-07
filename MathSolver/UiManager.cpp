@@ -64,7 +64,7 @@ void UiManager::UpdateSfmlEvents()
 
 void UiManager::Init()
 {
-    baseFont.loadFromFile("arial.ttf");
+    UiElement::baseFont.loadFromFile("arial.ttf");
     InitScreens();
 }
 
@@ -133,11 +133,11 @@ void UiManager::InitScreens()
     Screen* Open = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, {0,0,1,1}, window);
     screens.insert({ "01open", Open });
     Open->SetActive(false);
-    TextBox* textbox = new TextBox(*UiElement::textureMap["TextBox"], baseFont, {BASE_SCREEN_W / 2, BASE_SCREEN_H/4}, {800, 130}, "Enter Room Code", sf::Color::Black, 60);
+    TextBox* textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, {BASE_SCREEN_W / 2, BASE_SCREEN_H/4}, {800, 130}, "Enter Room Code", sf::Color::Black, 60);
     textbox->SetOrigin(Center);
     textbox->SetName("RoomCode");
     Open->AddElement(textbox);
-    textbox = new TextBox(*UiElement::textureMap["TextBox"], baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H/4*2 }, { 800, 130 }, "Enter Name", sf::Color::Black, 60);
+    textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H/4*2 }, { 800, 130 }, "Enter Name", sf::Color::Black, 60);
     textbox->SetOrigin(Center);
     Open->AddElement(textbox);
     auto confunc = [this]() {string ip = ((TextBox*)screens["01open"]->GetElementByName("RoomCode"))->GetText();
@@ -150,11 +150,11 @@ void UiManager::InitScreens()
     Screen* Join = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, { 0,0,1,1 }, window);
     screens.insert({ "01join", Join });
     Join->SetActive(false);
-    textbox = new TextBox(*UiElement::textureMap["TextBox"], baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 }, { 800, 130 }, "Enter IP", sf::Color::Black, 60);
+    textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 }, { 800, 130 }, "Enter IP", sf::Color::Black, 60);
     textbox->SetOrigin(Center);
     textbox->SetName("ip");
     Join->AddElement(textbox);
-    textbox = new TextBox(*UiElement::textureMap["TextBox"], baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 * 2 }, { 800, 130 }, "Enter Room Code", sf::Color::Black, 60);
+    textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 * 2 }, { 800, 130 }, "Enter Room Code", sf::Color::Black, 60);
     textbox->SetOrigin(Center);
     textbox->SetName("RoomCode");
     Join->AddElement(textbox);
@@ -174,18 +174,47 @@ void UiManager::InitScreens()
     Draw->AddElement(dsc);
 
 
-    //Image* mm1 = new Image(*UiElement::textureMap["Wrec"], { 0 , 0 }, { BASE_SCREEN_W, BASE_SCREEN_H });
-    Screen* tools = new Screen(BASE_DRAW_SCREEN_W, BASE_DRAW_SCREEN_H, { 0,0.0,5 / 6.0, 1 / 6.0 }, window, ScaleByWith);
+    Screen* tools = new Screen(BASE_DRAW_SCREEN_W*5.0/6.0, BASE_DRAW_SCREEN_H/6.0, { 0,0.0,5 / 6.0, 1 / 6.0 }, window, AlignLeft);
     tools->SetActive(false);
     screens.insert({ "03Tools", tools });
-    //tools->AddElement(mm1);
 
-    //Image* mm2 = new Image(*UiElement::textureMap["Wrec"], { 0 , 0 }, { BASE_SCREEN_W, BASE_SCREEN_H });
     Screen* participents = new Screen(BASE_DRAW_SCREEN_W * 1.0 / 6, BASE_DRAW_SCREEN_H, { 5 / 6.0,0,1 / 6.0, 1 }, window, ScaleByWith);
     participents->SetActive(false);
     screens.insert({ "03Participents", participents });
-    //participents->AddElement(mm2);
 
+    tools->AddElement(new Button(*UiElement::textureMap["blackButton"], 
+        [changecolor = sf::Color(0, 0, 0), this](){ this->GetMeeting()->SetColor(changecolor); }, 
+        { 200, 20 }, {30,30}));
+    tools->AddElement(new Button(*UiElement::textureMap["redButton"], 
+        [changecolor = sf::Color(255, 0, 0), this](){ this->GetMeeting()->SetColor(changecolor); }, 
+        { 200, 70 }, { 30,30 }));
+    tools->AddElement(new Button(*UiElement::textureMap["blueButton"], 
+        [changecolor = sf::Color(0, 0, 255), this](){ this->GetMeeting()->SetColor(changecolor); }, 
+        { 250, 20 }, { 30,30 }));
+    tools->AddElement(new Button(*UiElement::textureMap["greenButton"], 
+        [changecolor = sf::Color(0, 255, 0), this](){ this->GetMeeting()->SetColor(changecolor); }, 
+        { 250, 70 }, { 30,30 }));
+    tools->AddElement(new Button(*UiElement::textureMap["yellowButton"], 
+        [changecolor = sf::Color(255, 255, 0), this](){ this->GetMeeting()->SetColor(changecolor); }, 
+        { 300, 20 }, { 30,30 }));
+    tools->AddElement(new Button(*UiElement::textureMap["orangeButton"], 
+        [changecolor = sf::Color(255, 127, 0), this](){ this->GetMeeting()->SetColor(changecolor); }, 
+        { 300, 70 }, { 30,30 }));
+    tools->AddElement(new Button(*UiElement::textureMap["lightBlueButton"], 
+        [changecolor = sf::Color(0, 255, 255), this](){ this->GetMeeting()->SetColor(changecolor); }, 
+        { 350, 20 }, { 30,30 }));
+    tools->AddElement(new Button(*UiElement::textureMap["pinkButton"], 
+        [changecolor = sf::Color(255, 0, 255), this](){ this->GetMeeting()->SetColor(changecolor); }, 
+        { 350, 70 }, { 30,30 }));
+    tools->AddElement(new Button(*UiElement::textureMap["purpleButton"],
+        [changecolor = sf::Color(127, 0, 255), this](){ this->GetMeeting()->SetColor(changecolor); },
+        { 400, 20 }, { 30,30 }));
+    tools->AddElement(new Button(*UiElement::textureMap["eraserButton"],
+        [changecolor = sf::Color(255, 255, 255), this](){ this->GetMeeting()->SetColor(changecolor); },
+        { 400, 70 }, { 30,30 }));
+
+    tools->AddElement(new ScrollBar([this](float val) { this->GetMeeting()->SetRadius(val); std::cout << val << "\n"; },
+        {1, 10}, { 450, 49 }, { 1476 / 5.0,110 / 5.0 }));
 
     meeting = new Meeting(Draw, participents, tools, &cl);
 }
@@ -196,16 +225,23 @@ void UiManager::Start()
     //cl.Connect(ip, 16016);
 
 
-
     window = new sf::RenderWindow(sf::VideoMode(BASE_SCREEN_W, BASE_SCREEN_H), "Math Link");
     this->lastWindowSize = window->getSize();
     window->setFramerateLimit(60);
     Init();
-    sf::Clock c;
     float m = 0;
+    sf::Clock c;
     c.restart();
     while (window->isOpen())
     {
+        //std::cout << 1 / c.restart().asSeconds() << std::endl;
+        //if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+        //    std::shared_ptr<Packet> pingPacket = std::make_shared<Packet>();
+        //    std::string s = "omeriss";
+        //    (*pingPacket) << s;
+        //    pingPacket->GetHeader().packetType = RoomRequest;
+        //    this->cl.SendUdp(std::move(pingPacket));
+        //}
         UpdateSfmlEvents();
         PacketExecutor::GetInstance()->Udate();
         window->clear(Backround_Color);

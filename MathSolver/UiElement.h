@@ -20,6 +20,7 @@ public:
 	static bool MouseInScreen;
 	static int MouseWheelDelta;
 	static std::map<std::string, sf::Texture*>& textureMap;
+	static sf::Font baseFont;
 	UiElement(const sf::Texture& texture);
 	UiElement(const sf::Texture& texture, sf::Vector2f pos, sf::Vector2f size);
 	UiElement();

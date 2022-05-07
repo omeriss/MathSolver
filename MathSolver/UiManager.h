@@ -20,6 +20,7 @@
 #include "Client.h"
 #include "DrawScreen.h"
 #include "Meeting.h"
+#include "ScrollBar.h"
 
 class UiManager
 {
@@ -41,8 +42,6 @@ private:
 	Meeting* meeting;
 	std::map<std::string,Screen*> screens;
 	sf::RenderWindow* window;
-	sf::Font baseFont;
 	sf::Vector2u lastWindowSize;
-	
 };
 

@@ -26,6 +26,7 @@ bool Client::Connect(std::string& ip, int16_t port, std::string roomCode)
 			{
 				if (!ec)
 				{
+					std::cout << tcp->GetSocket().local_endpoint().port() << std::endl;
 					UDP::socket = new asio::ip::udp::socket(service, asio::ip::udp::endpoint(asio::ip::udp::v4(), tcp->GetSocket().local_endpoint().port()));
 					udp = new UDP(service, endpointUdp->endpoint());
 

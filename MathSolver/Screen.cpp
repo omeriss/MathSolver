@@ -21,9 +21,10 @@ Screen::Screen(int w, int h, sf::FloatRect port, sf::RenderWindow* window, Scree
 
 void Screen::ReScale(int width, int height, int lastWidth, int lastHeight)
 {
-	float scale = (screenType == ScaleByWith)? view.getSize().x * 1.0 / width :view.getSize().y * 1.0 / height;
+	float scale = (screenType == ScaleByWith)? view.getSize().x * 1.0 / width / view.getViewport().width * view.getViewport().height :view.getSize().y * 1.0 / height / view.getViewport().height * view.getViewport().width;
+	//float scale = (screenType == ScaleByWith) ? lastWidth * 1.0/view.getSize().x/ width : lastHeight * 1.0 / height;
 	sf::FloatRect portCords;
-	printf("%d %d\n", this->winodw->getSize().x, this->winodw->getSize().y);
+	//printf("%d %d\n", this->winodw->getSize().x, this->winodw->getSize().y);
 	switch (screenType)
 	{
 	case AlignLeft:

@@ -8,9 +8,9 @@ Meeting::Meeting(Screen* boardS, Screen* paricipentsS, Screen* toolsS, Client* c
 	this->board = (DrawScreen*)boardScreen->GetElementByName("board");
 	this->client = cl;
 	board->SetClinet(cl);
-	this->type = Host;
-	participantsCount = 1;
-	new Participant(0, 0, participentsScreen);
+	this->participentType = ParticipentType::WatchOnly;
+	participantsCount = 0;
+	//participants[0] = new Participant(0, 0, paricipentsS);
 }
 
 void Meeting::SetActive(bool state)
@@ -19,8 +19,17 @@ void Meeting::SetActive(bool state)
 	boardScreen->SetActive(isActive);
 	participentsScreen->SetActive(isActive);
 	toolsScreen->SetActive(isActive);
-	if (state == true)
+	if (state == true) {
+		if (sf::SoundBufferRecorder::getAvailableDevices().size() >= 1 && sf::Keyboard::isKeyPressed(sf::Keyboard::Tab)) {
+			for (auto u : sf::SoundBufferRecorder::getAvailableDevices()) {
+				std::cout << u << "\n";
+			}
+			int micIndex;
+			std::cin >> micIndex;
+			voiceRecorder.setDevice(sf::SoundBufferRecorder::getAvailableDevices()[micIndex]);
+		}
 		voiceRecorder.start(SampleRate);
+	}
 	else
 		voiceRecorder.stop();
 
@@ -36,10 +45,12 @@ void Meeting::SetLine(int y, array<sf::Color, BASE_DRAW_SCREEN_W>& pixels)
 	board->SetLine(y, pixels);
 }
 
-void Meeting::AddParticipant(uint32_t uid)
+void Meeting::AddParticipant(uint32_t uid, ParticipentType pType)
 {
 	participants[uid] = new Participant(uid, participantsCount++, participentsScreen);
-	if (type == Host) {
+	participants[uid]->SetParticipentType(pType);
+	participants[uid]->SetButtonMode(this->participentType == ParticipentType::Host);
+	if (participentType == ParticipentType::Host) {
 		vector<array<sf::Color, BASE_DRAW_SCREEN_W>>& boardPixels = board->GetBoard();
 		int i = 0;
 		for (auto& line : boardPixels) {
@@ -65,4 +76,45 @@ void Meeting::RemoveParticipant(uint32_t uid)
 	for (auto p : participants) {
 		p.second->CorrectPosition(pos);
 	}
+	participantsCount--;
+}
+
+void Meeting::PlayAudioData(uint32_t uid, Byte* soundData, int dataSize)
+{
+	auto sentFrom = participants.find(uid);
+	if(sentFrom != participants.end())
+		sentFrom->second->LoadSoundData(soundData, dataSize);
+}
+
+void Meeting::SetColor(sf::Color color)
+{
+	this->board->SetColor(color);
+}
+
+void Meeting::SetParticipentType(uint32_t uid, ParticipentType participentType)
+{
+	if (uid == selfId) {
+		this->participentType = participentType;
+		board->SetDrawMode(participentType >= ParticipentType::Editor);
+		for (auto pr : participants) {
+			pr.second->SetButtonMode(participentType == ParticipentType::Host);
+		}
+		
+	}
+	else {
+		auto pr = participants.find(uid);
+		if (pr == participants.end())
+			return;
+		pr->second->SetParticipentType(participentType);
+	}
+}
+
+void Meeting::SetSelfId(uint32_t selfId)
+{
+	this->selfId = selfId;
+}
+
+void Meeting::SetRadius(float r)
+{
+	this->board->SetRadius(r);
 }

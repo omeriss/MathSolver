@@ -14,11 +14,17 @@ TextBox::TextBox(sf::Texture& texture, sf::Font& font, sf::Vector2f pos, sf::Vec
 	tempTxt.setFillColor(sf::Color(200, 200, 200));
 	tempTxt.setCharacterSize(textSize);
 	//tempTxt.setPosition(pos.x + text.getLetterSpacing() * 5, pos.y);
-	tempTxt.setString(tempString);
+	if (textType == NoEdit)
+		text.setString(tempString);
+	else
+		tempTxt.setString(tempString);
 
 	if (type == Text) {
 		text.setPosition(pos.x + text.getLetterSpacing() * 5, pos.y);
 		tempTxt.setPosition(pos.x + text.getLetterSpacing() * 5, pos.y);
+	}
+	else if (textType == NoEdit) {
+		text.setPosition(pos.x, pos.y);
 	}
 	else {
 		text.setPosition(pos.x + text.getLetterSpacing() * 30, pos.y+sprite.getGlobalBounds().height/2-text.getCharacterSize()/2 - text.getLineSpacing() * 10);
@@ -45,6 +51,8 @@ std::string TextBox::GetText()
 
 void TextBox::Update(sf::RenderWindow& window)
 {
+	if (type == NoEdit)
+		return;
 
 	sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {

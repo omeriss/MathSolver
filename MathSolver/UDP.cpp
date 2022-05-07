@@ -81,6 +81,8 @@ void UDP::Write()
 	socket->async_send_to(tempVec, endpoint, [this](std::error_code errorCode, int len) {
 		if (errorCode) {
 			std::cout << "cant Write" << std::endl;
+			sendQueue.pop();
+			Write(); // check
 		}
 		else {
 			sendQueue.pop();

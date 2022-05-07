@@ -137,6 +137,7 @@ pair<float, bool> getVal(float a, float b, char op) {
 	case '/':return { a / b, true };
 	case '^':return { pow(a, b), true };
 	}
+	return {0, false};
 }
 
 pair<float, bool> Graph::Calc(float x)

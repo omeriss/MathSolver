@@ -151,6 +151,8 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="DrawScreen.cpp" />
+    <ClCompile Include="NeuralNetwork.cpp" />
+    <ClCompile Include="ScrollBar.cpp" />
     <ClCompile Include="TCP.cpp" />
     <ClCompile Include="DragBar.cpp" />
     <ClCompile Include="Meeting.cpp" />
@@ -162,6 +164,7 @@
     <ClCompile Include="PacketExecutor.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="TextBox.cpp" />
+    <ClCompile Include="ToggleButton.cpp" />
     <ClCompile Include="UDP.cpp" />
     <ClCompile Include="UiElement.cpp" />
     <ClCompile Include="UiManager.cpp" />
@@ -170,6 +173,8 @@
     <ClInclude Include="Button.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="DrawScreen.h" />
+    <ClInclude Include="NeuralNetwork.h" />
+    <ClInclude Include="ScrollBar.h" />
     <ClInclude Include="TCP.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="DragBar.h" />
@@ -181,6 +186,7 @@
     <ClInclude Include="PacketExecutor.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="TextBox.h" />
+    <ClInclude Include="ToggleButton.h" />
     <ClInclude Include="UDP.h" />
     <ClInclude Include="UiElement.h" />
     <ClInclude Include="UiManager.h" />

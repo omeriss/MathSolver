@@ -36,6 +36,7 @@ UiManager* UiManager::instance = new UiManager();
 PacketExecutor* PacketExecutor::instance;
 asio::ip::udp::socket* UDP::socket = NULL;
 UdpReadData UDP::readData;
+sf::Font UiElement::baseFont = sf::Font();
 #pragma endregion
 
 

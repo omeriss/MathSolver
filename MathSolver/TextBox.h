@@ -3,7 +3,7 @@
 #include "UiElement.h"
 using namespace std;
 
-typedef enum {Text, OneLine, Password, Number} TextType;
+typedef enum {Text, OneLine, Password, Number, NoEdit} TextType;
 
 class TextBox :
     public UiElement

@@ -4,11 +4,15 @@ void HandleDisconnectFromServer(uint32_t id, Packet* p)
 {
 	std::cout << "disconnected" << std::endl;
 	UiManager::GetInstance()->cl.Disconnect();
+	UiManager::GetInstance()->GetMeeting()->SetActive(false);
+	UiManager::GetInstance()->GetScreens()["00main"]->SetActive(true);
 }
 
 void HandlePingBack(uint32_t id, Packet* p)
 {
+	uint32_t myId;
 	std::string roomCode;
+	(*p) >> myId;
 	(*p) >> roomCode;
 	if (roomCode == "") {
 		std::cout << "Can't join room" << std::endl;
@@ -20,30 +24,12 @@ void HandlePingBack(uint32_t id, Packet* p)
 	UiManager::GetInstance()->GetScreens()["01join"]->SetActive(false);
 }
 
-#include <SFML/Audio.hpp>
-
 void AudioH(uint32_t id, Packet* p)
 {
-
-	static sf::SoundBuffer b;
-	static sf::Int16 bu[10000];
-	static int from = 0;
-	static sf::Sound s;
-	//std::cout << p->GetHeader().size << std::endl;
-	if (from < 3000) {
-		std::memcpy(bu+from, (const sf::Int16*)p->GetData(), p->GetHeader().size);
-		from += p->GetHeader().size / sizeof(sf::Int16);
-		std::cout << 1;
-	}
-	else {
-		std::memcpy(bu + from, (const sf::Int16*)p->GetData(), p->GetHeader().size);
-		from += p->GetHeader().size / sizeof(sf::Int16);
-		b.loadFromSamples(bu, from, 1, 10000);
-		from = 0;
-		s.setBuffer(b);
-		s.play();
-		std::cout << 2;
-	}
+	Byte* soundData = p->GetData();
+	uint32_t uid;
+	std::memcpy(&uid, soundData + p->GetHeader().size - sizeof(uint32_t), sizeof(uint32_t));
+	UiManager::GetInstance()->GetMeeting()->PlayAudioData(uid, p->GetData(), p->GetHeader().size - sizeof(uint32_t));
 }
 
 void HandleLine(uint32_t id, Packet* p)
@@ -67,7 +53,9 @@ void HandleUserConnected(uint32_t id, Packet* p)
 {
 	uint32_t newid;
 	(*p) >> newid;
-	UiManager::GetInstance()->GetMeeting()->AddParticipant(newid);
+	ParticipentType temp;
+	(*p) >> temp;
+	UiManager::GetInstance()->GetMeeting()->AddParticipant(newid, temp);
 	std::cout << "New user connected: " << newid <<std::endl;
 }
 
@@ -77,4 +65,13 @@ void HandleUserDisconnected(uint32_t id, Packet* p)
 	(*p) >> removedId;
 	UiManager::GetInstance()->GetMeeting()->RemoveParticipant(removedId);
 	std::cout << "user disconnected: " << removedId << std::endl;
+}
+
+void HandleChangeParticipentType(uint32_t id, Packet* p)
+{
+	uint32_t pid;
+	(*p) >> pid;
+	ParticipentType temp;
+	(*p) >> temp;
+	UiManager::GetInstance()->GetMeeting()->SetParticipentType(pid, temp);
 }
