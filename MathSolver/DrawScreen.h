@@ -4,7 +4,7 @@
 #include <array>
 #include <stack>
 #include "Client.h"
-#include "NeuralNetwork.h"
+#include "EquationAnalizer.h"
 
 using std::vector, std::array, std::queue;
 
@@ -12,7 +12,7 @@ class DrawScreen :
     public UiElement
 {
 public:
-	DrawScreen(sf::Vector2f pos, sf::Vector2f size);
+	DrawScreen(sf::Vector2f pos, sf::Vector2f size, Screen* subScreen = nullptr);
 	void Update(sf::RenderWindow& window);
 	void Print(sf::RenderWindow& window);
 	void Draw(sf::RenderWindow& window);
@@ -25,13 +25,14 @@ public:
 	void SetColor(sf::Color color);
 	void SetRadius(float r);
 	void SetDrawMode(bool canDraw);
+	void Clear();
+	void SetSubScreen(Screen* subScreen);
 	vector<array<sf::Color, BASE_DRAW_SCREEN_W>>& GetBoard();
 	std::pair<sf::IntRect, double*> findChar(int startX, int startY, sf::IntRect area, bool* done);
 	vector<std::pair<sf::IntRect, double*>> FindChars(sf::IntRect area);
 
 private:
 	bool canDraw;
-	NeuralNetwork* network;
 	sf::RenderTexture board;
 	sf::RenderTexture overlay;
 	sf::Sprite OverlaySprite;
@@ -44,5 +45,6 @@ private:
 	vector<array<sf::Color, BASE_DRAW_SCREEN_W>> boardPixels;
 	Client* clinet;
 	float drawRadius;
+	EquationAnalizer equationAnalizer;
 };
 

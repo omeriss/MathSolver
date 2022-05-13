@@ -19,17 +19,7 @@ TextBox::TextBox(sf::Texture& texture, sf::Font& font, sf::Vector2f pos, sf::Vec
 	else
 		tempTxt.setString(tempString);
 
-	if (type == Text) {
-		text.setPosition(pos.x + text.getLetterSpacing() * 5, pos.y);
-		tempTxt.setPosition(pos.x + text.getLetterSpacing() * 5, pos.y);
-	}
-	else if (textType == NoEdit) {
-		text.setPosition(pos.x, pos.y);
-	}
-	else {
-		text.setPosition(pos.x + text.getLetterSpacing() * 30, pos.y+sprite.getGlobalBounds().height/2-text.getCharacterSize()/2 - text.getLineSpacing() * 10);
-		tempTxt.setPosition(pos.x + text.getLetterSpacing() * 30, pos.y + sprite.getGlobalBounds().height/2 - text.getCharacterSize() / 2 - text.getLineSpacing()*10);
-	}
+	SetTextPosition(pos);
 
 	writeMode = false;
 	letMove = false;
@@ -46,6 +36,17 @@ void TextBox::AddToString(char c)
 std::string TextBox::GetText()
 {
 	return text.getString();
+}
+
+void TextBox::Clear()
+{
+	this->text.setString("");
+}
+
+void TextBox::SetString(std::string str)
+{
+	onChar = -1;
+	this->text.setString(str);
 }
 
 
@@ -151,6 +152,27 @@ void TextBox::Print(sf::RenderWindow& window)
 		RectPos.x -= text.getLetterSpacing() / 2;
 		PosRect.setPosition(RectPos);
 		window.draw(PosRect);
+	}
+}
+
+void TextBox::SetPosition(sf::Vector2f position)
+{
+	UiElement::SetPosition(position);
+	SetTextPosition(position);
+}
+
+void TextBox::SetTextPosition(sf::Vector2f position)
+{
+	if (type == Text) {
+		text.setPosition(position.x + text.getLetterSpacing() * 5, position.y);
+		tempTxt.setPosition(position.x + text.getLetterSpacing() * 5, position.y);
+	}
+	else if (type == NoEdit) {
+		text.setPosition(position.x, position.y);
+	}
+	else {
+		text.setPosition(position.x + text.getLetterSpacing() * 30, position.y + sprite.getGlobalBounds().height / 2 - text.getCharacterSize() / 2 - text.getLineSpacing() * 10);
+		tempTxt.setPosition(position.x + text.getLetterSpacing() * 30, position.y + sprite.getGlobalBounds().height / 2 - text.getCharacterSize() / 2 - text.getLineSpacing() * 10);
 	}
 }
 

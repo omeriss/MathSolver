@@ -13,6 +13,7 @@ Graph::Graph(sf::Vector2f pos, sf::Vector2f size, std::vector<CalcElement>& Fx)
 	this->Fx = Fx;
 	sprite.setPosition(pos);
 	moving = false;
+	clicked = false;
 	UpdateNextFrame = true;
 	xWeight = StartGraphXW;
 	sprite.setTexture(renderTex.getTexture());
@@ -112,20 +113,32 @@ void Graph::Print(sf::RenderWindow& window)
 void Graph::MoveGraph(sf::RenderWindow& window)
 {
 	sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)
-		&& InsideSprite(mousePos)) {
-		if (moving) {
-			GraphView.move(lastPos.x - mousePos.x, lastPos.y - mousePos.y);
-			renderTex.setView(GraphView);
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+		if (InsideSprite(mousePos) && !clicked) {
+			if (moving) {
+				GraphView.move(lastPos.x - mousePos.x, lastPos.y - mousePos.y);
+				renderTex.setView(GraphView);
+			}
+			else
+				moving = true;
+			lastPos = mousePos;
 		}
-		else
-			moving = true;
-		lastPos = mousePos;
+		else {
+			moving = false;
+			clicked = true;
+		}
 	}
-	else
+	else {
 		moving = false;
+		clicked = false;
+	}
 
 	UpdateNextFrame |= moving;
+}
+
+void Graph::SetFx(std::vector<CalcElement> Fx)
+{
+	this->Fx = Fx;
 }
 
 pair<float, bool> getVal(float a, float b, char op) {

@@ -8,3 +8,8 @@ void Image::Print(sf::RenderWindow& window)
 {
 	window.draw(sprite);
 }
+
+void Image::ChangeTexture(sf::Texture& texture)
+{
+	this->sprite.setTexture(texture);
+}

@@ -15,7 +15,7 @@ enum class ParticipentType :uint16_t {
 
 class Participant {
 public:
-    Participant(uint32_t uid, int pos, Screen* participentsScreen){
+    Participant(uint32_t uid, int pos, Screen* participentsScreen, Client* cl){
         this->uid = uid;
         this->pos = pos;
 
@@ -26,7 +26,14 @@ public:
             { User_Lable_Size_x, User_Lable_Size_y - User_Name_Offset_X }, "omeriss", sf::Color::Black, User_Name_Font_Size, NoEdit);
         participentsScreen->AddElement(userName);
 
-        canDraw = new ToggleButton(*UiElement::textureMap["notEditorButton"], *UiElement::textureMap["editorButton"], [](bool b) {return; }, 
+        canDraw = new ToggleButton(*UiElement::textureMap["notEditorButton"], *UiElement::textureMap["editorButton"],
+            [cl, this](bool b) {
+                std::shared_ptr<Packet> packet = make_shared<Packet>();
+                packet->GetHeader().packetType = ChangeParticipentType;
+                (*packet) << this->uid;
+                (*packet) << (b ? ParticipentType::Editor : ParticipentType::WatchOnly);
+                cl->SendTcp(packet);
+            }, 
             { Start_Offset_x + Draw_Button_Offset_X, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y + Draw_Button_Offset_From_Button_Top }, { Draw_Button_Size, Draw_Button_Size});
         participentsScreen->AddElement(canDraw);
 
@@ -50,6 +57,8 @@ public:
             return;
         pos--;
         UserRec->SetPosition({ Start_Offset_x, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y });
+        userName->SetPosition({ Start_Offset_x + User_Name_Offset_X, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y + UserName_Offset_From_Button_Top });
+        canDraw->SetPosition({ Start_Offset_x + Draw_Button_Offset_X, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y + Draw_Button_Offset_From_Button_Top });
     }
 
     void LoadSoundData(Byte* soundData, int dataSize) {
@@ -114,16 +123,6 @@ private:
     }
     virtual bool onProcessSamples(const sf::Int16* samples, std::size_t sampleCount)
     {
-        //static sf::SoundBuffer bf;
-        //static sf::Sound so;
-        //sf::Int16* samples2 = new sf::Int16[sampleCount];
-        //std::memcpy(samples2, samples, sampleCount * sizeof(sf::Int16));
-        //bf.loadFromSamples(samples2, sampleCount, ChannelCount, SampleRate);
-        //so.setBuffer(bf);
-        //so.play();
-        //for (int i = 0; i < sampleCount; i++) {
-        //    std::cout << ((const sf::Int16*)samples)[i] << std::endl;
-        //}
         tr = new std::thread([samples, sampleCount, this]() {
             std::shared_ptr<Packet> packet = make_shared<Packet>();
             packet->GetHeader().packetType = Audiop;
@@ -140,7 +139,7 @@ private:
 class Meeting
 {
 public:
-    Meeting(Screen* boardS, Screen* paricipentsS, Screen* toolsS, Client* cl);
+    Meeting(Screen* boardS, Screen* paricipentsS, Screen* toolsS, Screen* subScreen, Client* cl);
     void SetActive(bool state);
     void SetCell(int x, int y, sf::Color color);
     void SetLine(int y, array<sf::Color, BASE_DRAW_SCREEN_W>& pixels);
@@ -151,6 +150,7 @@ public:
     void SetSelfId(uint32_t selfId);
     void SetRadius(float r);
     void SetParticipentType(uint32_t uid, ParticipentType participentType);
+    void ChangeRecorderState(bool active);
 private:
     bool isActive;
     Screen *boardScreen, *participentsScreen, *toolsScreen;

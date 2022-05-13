@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Button">
+    <Position X="12.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEQAAAAAAAAAAIgIAEAAAAAAAAAAAgAIAAAAAAAEAAA=</HashCode>
+      <FileName>Button.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UiElement">
+    <Position X="8" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAIACAAAAAJEAAAAEAEABAEAhAEAAACUAAEBAA=</HashCode>
+      <FileName>UiElement.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Screen">
+    <Position X="0.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AMAAAAAEAAAhCBAAFAAAABAAAABCAAACAQACAIAAAAA=</HashCode>
+      <FileName>Screen.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="screenType" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="DragBar">
+    <Position X="3.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAQAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAEABAAAEAAA=</HashCode>
+      <FileName>DragBar.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="screen" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Graph">
+    <Position X="13.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>iAQwAgAAAAAAAAAAAAAIAAAIgAAAAAgACEAgAAAEAAA=</HashCode>
+      <FileName>Graph.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Image">
+    <Position X="3.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAACAAAEAAA=</HashCode>
+      <FileName>Image.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ScrollBar">
+    <Position X="6" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQBAAgAAAABAAAIAAAAAAAAAAAAQAAAAAABAAAEAAA=</HashCode>
+      <FileName>ScrollBar.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextBox">
+    <Position X="7.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAACAAIAEAAIABAgAAAAAAABAgAIAAAAAACEAAA=</HashCode>
+      <FileName>TextBox.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ToggleButton">
+    <Position X="9.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAwAIAAAAAAAFIgAAAAAAAAAAAAAAgAEAAACAAAEAAA=</HashCode>
+      <FileName>ToggleButton.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Participant">
+    <Position X="15.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAiQEAAAACAAEMAAAAAABIABAAAAAAAACCACAAFAIAA=</HashCode>
+      <FileName>Meeting.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="participentType" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="VoiceChatSoundRecorder">
+    <Position X="13.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAQAABAAAAAQAAAAAAAAEQAAAAA=</HashCode>
+      <FileName>Meeting.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="clinet" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Meeting">
+    <Position X="0.5" Y="8.5" Width="1.5" />
+    <AssociationLine Name="boardScreen" Type="Screen">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.403" Y="0.265" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="participentsScreen" Type="Screen">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.328" Y="0.245" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="toolsScreen" Type="Screen">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.463" Y="0.737" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAcGAABACoAAAAAAAAAABABAIAAIAAAIAgIJYCAECA=</HashCode>
+      <FileName>Meeting.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="boardScreen" />
+      <Field Name="participentsScreen" />
+      <Field Name="toolsScreen" />
+      <Field Name="board" />
+      <Field Name="client" />
+      <Field Name="voiceRecorder" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="NeuralNetwork">
+    <Position X="8" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAgAgAAAAAAEAAQAAAAQAAAAAABAAAAIAjAAAAAA=</HashCode>
+      <FileName>NeuralNetwork.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UiManager">
+    <Position X="5.5" Y="1.25" Width="1.5" />
+    <AssociationLine Name="meeting" Type="Meeting" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="5.5" Y="3.615" />
+        <Point X="5.125" Y="3.615" />
+        <Point X="5.125" Y="5.75" />
+        <Point X="5.083" Y="5.75" Type="JumpStart" />
+        <Point X="4.917" Y="5.75" Type="JumpEnd" />
+        <Point X="4" Y="5.75" />
+        <Point X="4" Y="8.826" />
+        <Point X="2.49" Y="8.826" Type="JumpStart" />
+        <Point X="2.323" Y="8.826" Type="JumpEnd" />
+        <Point X="2" Y="8.826" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAQAIAAAECAgAAABAAAAAAAABAJAgAAIAAAiAAAgQAE=</HashCode>
+      <FileName>UiManager.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="cl" />
+      <Field Name="meeting" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="DrawScreen">
+    <Position X="4.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIQEIAgAgIEAAgEAAIAAABAAAAABAkAAKEoAEhDEFAE=</HashCode>
+      <FileName>DrawScreen.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="clinet" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Client">
+    <Position X="1.25" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAwCAAAAAAAAAAAAAAAAAIAAAAAAAAAAQEAgAAAAIAQ=</HashCode>
+      <FileName>Client.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="CalcElement">
+    <Position X="15.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Graph.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="OriginType">
+    <Position X="15.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAACAAAAAAAAAAAAAAAAAAAAAoAEA=</HashCode>
+      <FileName>UiElement.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ScreenType">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAEAAAAAAAEgAAAAEAAAQBAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Screen.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_001a_1">
+    <Position X="7.5" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAAAAAAAgCBAAACAAAAAA=</HashCode>
+      <FileName>TextBox.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ParticipentType">
+    <Position X="20.25" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAAAAQAAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Meeting.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

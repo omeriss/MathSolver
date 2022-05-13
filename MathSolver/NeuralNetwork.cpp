@@ -113,7 +113,7 @@ NeuralNetwork::NeuralNetwork(string fileName)
 	file.close();
 }
 
-int NeuralNetwork::Calc(double* input)
+std::vector<double> NeuralNetwork::Calc(double* input)
 {
 	// from input to first hidden
 	for (int i = 0; i < NumOfNodesInInput; i++) {
@@ -148,15 +148,7 @@ int NeuralNetwork::Calc(double* input)
 		layers[NumOfHiddenLayers + 1][i] = func(layers[NumOfHiddenLayers + 1][i]);
 	}
 
-	// find the max output
-	int maxn = 0;
-	for (int i = 1; i < NumOfNodesInOutput; i++) {
-		if (layers[NumOfHiddenLayers + 1][i] > layers[NumOfHiddenLayers + 1][maxn]) {
-			maxn = i;
-		}
-	}
-	return maxn;
-
+	return layers[NumOfHiddenLayers + 1];
 }
 
 void NeuralNetwork::SaveToFile(string fileName)
@@ -329,12 +321,24 @@ void NeuralNetwork::Learn(vector<double*>& input, vector<int>& label, double jum
 	}
 }
 
+int GetMaxIndex(std::vector<double> vec) {
+	//find the max output
+	int maxn = 0;
+	int vLen = vec.size();
+	for (int i = 1; i < vLen; i++) {
+		if (vec[i] > vec[maxn]) {
+			maxn = i;
+		}
+	}
+	return maxn;
+}
+
 void NeuralNetwork::Test(vector<double*>& input, vector<int>& label)
 {
 	int len = input.size();
 	int cor = 0;
 	for (int i = 0; i < len; i++) {
-		if (Calc(input[i]) == label[i])
+		if (GetMaxIndex(Calc(input[i])) == label[i])
 			cor++;
 	}
 	cout << (double)cor / len << endl;

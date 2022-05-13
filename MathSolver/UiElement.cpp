@@ -55,7 +55,7 @@ sf::Vector2f UiElement::GetPosition()
 
 bool UiElement::InsideSprite(sf::Vector2f pos)
 {
-	return MouseInScreen && pos.x >= sprite.getPosition().x - sprite.getOrigin().x * sprite.getScale().x && pos.y >= sprite.getPosition().y - sprite.getOrigin().y * sprite.getScale().y
+	return enableMouseClick && MouseInScreen && pos.x >= sprite.getPosition().x - sprite.getOrigin().x * sprite.getScale().x && pos.y >= sprite.getPosition().y - sprite.getOrigin().y * sprite.getScale().y
 		&& pos.x <= sprite.getPosition().x - sprite.getOrigin().x * sprite.getScale().x + sprite.getGlobalBounds().width
 		&& pos.y <= sprite.getPosition().y - sprite.getOrigin().y * sprite.getScale().y + sprite.getGlobalBounds().height;
 }

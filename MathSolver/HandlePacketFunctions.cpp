@@ -20,6 +20,7 @@ void HandlePingBack(uint32_t id, Packet* p)
 	}
 	std::cout << "Joined Room: " << roomCode << std::endl;
 	UiManager::GetInstance()->GetMeeting()->SetActive(true);
+	UiManager::GetInstance()->GetMeeting()->SetSelfId(myId);
 	UiManager::GetInstance()->GetScreens()["01open"]->SetActive(false);
 	UiManager::GetInstance()->GetScreens()["01join"]->SetActive(false);
 }

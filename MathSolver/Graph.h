@@ -24,6 +24,7 @@ public:
 	void Update(sf::RenderWindow& window);
 	void Print(sf::RenderWindow& window);
 	void MoveGraph(sf::RenderWindow& window);
+	void SetFx(std::vector<CalcElement> Fx);
 private:
 	const static pair<float, float> changes[12];
 	pair<float, bool> Calc(float x);
@@ -32,6 +33,7 @@ private:
 	sf::View GraphView;
 	float xWeight;
 	bool moving;
+	bool clicked;
 	sf::Vector2f lastPos;
 	bool UpdateNextFrame;
 };

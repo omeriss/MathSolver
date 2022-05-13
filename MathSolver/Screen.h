@@ -15,9 +15,13 @@ public:
 	void ReScale(int width, int height, int lastWidth, int lastHeight);
 	void AddElement(UiElement* element);
 	void RemoveElement(UiElement* element);
+	void clear();
 	virtual void UdpateScreen();
 	virtual void DrawScreen();
 	void SetActive(bool isActive);
+	bool IsActive();
+	void SwapUiElements(std::vector<UiElement*>& elements);
+	sf::FloatRect GetPort();
 	UiElement* GetElementByName(std::string name);
 protected:
 	sf::View view;

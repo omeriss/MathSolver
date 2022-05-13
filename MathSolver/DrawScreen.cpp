@@ -1,9 +1,8 @@
 #include "DrawScreen.h"
 
-DrawScreen::DrawScreen(sf::Vector2f pos, sf::Vector2f size)
+DrawScreen::DrawScreen(sf::Vector2f pos, sf::Vector2f size, Screen* subScreen)
 {
 	canDraw = false;
-	network = new NeuralNetwork(NNUploadFile);
 
 	overlay.create(BASE_DRAW_SCREEN_W, BASE_DRAW_SCREEN_H);
 	overlay.clear(sf::Color(0, 0, 0, 0));
@@ -13,7 +12,6 @@ DrawScreen::DrawScreen(sf::Vector2f pos, sf::Vector2f size)
 	View.setSize(BASE_DRAW_SCREEN_W, BASE_DRAW_SCREEN_H * Draw_Screen_H_Mul);
 	View.setCenter(BASE_DRAW_SCREEN_W/2, BASE_DRAW_SCREEN_H * Draw_Screen_H_Mul /2);
 	board.setView(View);
-	board.clear(BaseDrawScreenColor);
 
 	sprite.setPosition(pos);
 	sprite.setTexture(board.getTexture());
@@ -29,12 +27,8 @@ DrawScreen::DrawScreen(sf::Vector2f pos, sf::Vector2f size)
 
 	drawingRect = false;
 	boardPixels.resize(BASE_DRAW_SCREEN_H * Draw_Screen_H_Mul);
+	Clear();
 	this->clinet == nullptr;
-	for (auto& row : boardPixels) {
-		for (auto& pix : row) {
-			pix = sf::Color::White;
-		}
-	}
 }
 
 void DrawScreen::Update(sf::RenderWindow& window)
@@ -63,6 +57,7 @@ void DrawScreen::Update(sf::RenderWindow& window)
 		auto results = FindChars(sf::IntRect(std::min(mousePos.x, rectStart.x), std::min(mousePos.y, rectStart.y) - sprite.getPosition().y,
 			std::ceil(std::abs(mousePos.x - rectStart.x)), std::ceil(std::abs(mousePos.y - rectStart.y))));
 
+		this->equationAnalizer.LoadFromImages(results);
 
 		for (auto const& rect : results) {
 			sf::RectangleShape tempRect(sf::Vector2f(rect.first.width, rect.first.height));
@@ -174,6 +169,8 @@ void DrawScreen::SetCell(int x, int y, sf::Color color)
 	pixel.setPosition(x, y);
 	board.draw(pixel);
 	pixel.setFillColor(temp);
+	board.display();
+	sprite.setTexture(board.getTexture());
 }
 
 void DrawScreen::SetLine(int y, array<sf::Color, BASE_DRAW_SCREEN_W>& pixels)
@@ -193,6 +190,8 @@ void DrawScreen::SetLine(int y, array<sf::Color, BASE_DRAW_SCREEN_W>& pixels)
 	}
 
 	pixel.setFillColor(temp);
+	board.display();
+	sprite.setTexture(board.getTexture());
 }
 
 void DrawScreen::SetClinet(Client* cl)
@@ -215,17 +214,24 @@ void DrawScreen::SetDrawMode(bool canDraw)
 	this->canDraw = canDraw;
 }
 
+void DrawScreen::Clear()
+{
+	board.clear(BaseDrawScreenColor);
+	for (auto& row : boardPixels) {
+		for (auto& pix : row) {
+			pix = BaseDrawScreenColor;
+		}
+	}
+}
+
+void DrawScreen::SetSubScreen(Screen* subScreen)
+{
+	equationAnalizer.SetSubScreen(subScreen);
+}
+
 vector<array<sf::Color, BASE_DRAW_SCREEN_W>>& DrawScreen::GetBoard()
 {
 	return boardPixels;
-}
-
-sf::IntRect GetCombinedRect(sf::IntRect a, sf::IntRect b) {
-	int x = std::min(a.left, b.left);
-	int y = std::min(a.top, b.top);
-	int w = std::max(a.left + a.width, b.left + b.width) - x;
-	int h = std::max(a.top + a.height, b.top + b.height) - y;
-	return {x, y, w, h};
 }
 
 #define DirLen 8
@@ -275,18 +281,34 @@ std::pair<sf::IntRect, double*> DrawScreen::findChar(int startX, int startY, sf:
 	}
 	if (ImgScale > 1) {
 		std::cout << "The Char Is too Small" << std::endl;
+		bool* tempImage = new bool[long long(OgImgW) * long long(OgImgH)];
+		std::fill(tempImage, tempImage + long long(OgImgW) * long long(OgImgH) * sizeof(bool), false);
+		while (!positions.empty()) {
+			int x = positions.top().x - minX;
+			int y = positions.top().y - minY;
+			positions.pop();
+			tempImage[x * ((int)(OgImgH)) + y] = true;
+		}
+		for (int y = YInc; y < CharImageH - YInc; y++) {
+			for (int x = XInc; x < CharImageW - XInc; x++) {
+				if((int((x - XInc) / ImgScale)) * (int(OgImgH)) + int((y - YInc) / ImgScale) < OgImgW* OgImgH)
+					image[(x) *CharImageH+y] = tempImage[(int((x-XInc)/ ImgScale))*(int(OgImgH)) + int((y-YInc) / ImgScale)];
+			}
+		}
+		delete[] tempImage;
+	}
+	else {
+		while (!positions.empty()) {
+			int x = positions.top().x - minX;
+			int y = positions.top().y - minY;
+			positions.pop();
+			x = x * ImgScale + XInc;
+			y = y * ImgScale + YInc;
+			image[x * (CharImageH)+y] = 1;
+		}
 	}
 
-	while (!positions.empty()) {
-		int x = positions.top().x - minX;
-		int y = positions.top().y - minY;
-		positions.pop();
-		x = x * ImgScale + XInc;
-		y = y * ImgScale + YInc;
-		image[x * (CharImageH) + y] = 1;
-	}
-
-	std::cout << network->Calc(image);
+	
 	if (FolderToSaveImgs != "") {
 		sf::Image tempImg;
 		tempImg.create(CharImageH, CharImageW);

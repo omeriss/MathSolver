@@ -21,6 +21,7 @@
 #define MouseWheelSensitivity 10 
 #define BaseDrawScreenColor sf::Color(255, 255, 255)
 #define MarkedColor sf::Color(100, 100, 100, 100)
+//#define FolderToSaveImgs ""
 #define FolderToSaveImgs "C:\\Users\\user\\source\\repos\\MathSolver\\x64\\Debug\\nning"
 
 // Meeting
@@ -55,5 +56,5 @@
 #define NumOfNodesInOutput 10
 #define SetSize 10
 #define LEARNRATE 2
-#define NNSaveFile "neww.dat"
-#define NNUploadFile "neww.dat"
+#define NNSaveFile "with14.dat"
+#define NNUploadFile "with14.dat"

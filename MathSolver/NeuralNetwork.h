@@ -9,7 +9,7 @@ using namespace std;
 #define NumOfHiddenLayers 3
 #define NumOfNodesInHidden 40
 #define NumOfNodesInInput 2025
-#define NumOfNodesInOutput 10
+#define NumOfNodesInOutput 14
 #define SetSize 10
 #define TimeTOGoOverTrain 10
 
@@ -21,7 +21,7 @@ class NeuralNetwork
 public:
 	NeuralNetwork();
 	NeuralNetwork(string fileName);
-	int Calc(double* input);
+	std::vector<double> Calc(double* input);
 	void SaveToFile(string fileName);
 	void BackProp(vector<double*> input, vector<int> label, double jumpSize);
 	void Learn(vector<double*>& input, vector<int>& label, double jumpSize);

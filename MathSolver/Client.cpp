@@ -71,12 +71,16 @@ void Client::SendTcp(std::shared_ptr<Packet> packet)
 }
 
 
-void Client::Disconnect()
+void Client::Disconnect(bool destory)
 {
 	tcp->Disconnect();
-	service.stop();
-	delete tcp;
-	delete udp;
-	udp = nullptr;
-	tcp = nullptr;
+	UDP::socket->close();
+	if (destory) {
+		service.stop();
+		UDP::socket == NULL;
+		delete tcp;
+		delete udp;
+		udp = nullptr;
+		tcp = nullptr;
+	}
 }

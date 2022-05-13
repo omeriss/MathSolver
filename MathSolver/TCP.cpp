@@ -1,6 +1,6 @@
 #include "TCP.h"
 
-TCP::TCP(asio::io_service& s) :service(s), socket(s), SendStrand(s)
+TCP::TCP(asio::io_service& s) :NetworkProtocol(s), socket(s)
 {
 }
 
@@ -19,7 +19,7 @@ void TCP::ReadPacket()
 	asio::async_read(socket, asio::buffer(&temp->GetHeader(), sizeof(Header)),
 		[temp, this](std::error_code errorCode, int len) {
 			if (errorCode) {
-				socket.close();
+				Disconnect();
 				Packet* disconnectPacket = new Packet();
 				disconnectPacket->GetHeader().packetType = 0;
 				PacketExecutor::GetInstance()->HandlePacket(id, disconnectPacket);
@@ -52,32 +52,15 @@ void TCP::ReadPacket()
 		});
 }
 
-void TCP::Send(std::shared_ptr<Packet> packet)
-{
-	service.post(SendStrand.wrap([this, packet]() {
-		bool notWriting = sendQueue.empty();
-		sendQueue.push(packet);
-		if (notWriting) {
-			Write();
-		}
-		}));
-}
-
-void TCP::SetId(uint32_t id)
-{
-	this->id = id;
-}
-
-uint32_t TCP::GetId()
-{
-	return id;
-}
-
-
 void TCP::Disconnect()
 {
-	if (socket.is_open())
-		socket.close();
+	try {
+		if (socket.is_open())
+			socket.close();
+	}
+	catch(...){
+		std::cout << "error" << std::endl;
+	}
 }
 
 void TCP::Write()

@@ -1,3 +1,5 @@
+//Main.cpp : This file contains the 'main' function.Program execution begins and ends there.
+
 #define WIN32_LEAN_AND_MEAN
 #include <SFML/Graphics.hpp>
 #include <iostream>
@@ -36,12 +38,14 @@ UiManager* UiManager::instance = new UiManager();
 PacketExecutor* PacketExecutor::instance;
 asio::ip::udp::socket* UDP::socket = NULL;
 UdpReadData UDP::readData;
+bool UiElement::enableMouseClick = true;
 sf::Font UiElement::baseFont = sf::Font();
 #pragma endregion
 
 
 
 int main(){
+    srand(time(NULL));
     PacketExecutor::GetInstance()->SetFunctions(CreatePacketVector);
     UiManager::GetInstance()->Start();
     return 0;

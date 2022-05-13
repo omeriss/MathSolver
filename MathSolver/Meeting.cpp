@@ -1,6 +1,6 @@
 #include "Meeting.h"
 
-Meeting::Meeting(Screen* boardS, Screen* paricipentsS, Screen* toolsS, Client* cl):voiceRecorder(cl)
+Meeting::Meeting(Screen* boardS, Screen* paricipentsS, Screen* toolsS, Screen* subScreen, Client* cl):voiceRecorder(cl)
 {
 	this->boardScreen = boardS;
 	this->participentsScreen = paricipentsS;
@@ -8,8 +8,7 @@ Meeting::Meeting(Screen* boardS, Screen* paricipentsS, Screen* toolsS, Client* c
 	this->board = (DrawScreen*)boardScreen->GetElementByName("board");
 	this->client = cl;
 	board->SetClinet(cl);
-	this->participentType = ParticipentType::WatchOnly;
-	participantsCount = 0;
+	((DrawScreen*)boardS->GetElementByName("board"))->SetSubScreen(subScreen);
 	//participants[0] = new Participant(0, 0, paricipentsS);
 }
 
@@ -28,10 +27,20 @@ void Meeting::SetActive(bool state)
 			std::cin >> micIndex;
 			voiceRecorder.setDevice(sf::SoundBufferRecorder::getAvailableDevices()[micIndex]);
 		}
+		this->participentType = ParticipentType::WatchOnly;
+		board->SetDrawMode(false);
+		participantsCount = 0;
+		((ToggleButton*)toolsScreen->GetElementByName("MuteButton"))->ChangeState(false);
 		voiceRecorder.start(SampleRate);
 	}
-	else
+	else {
+		for (auto p : participants) {
+			delete p.second;
+		}
+		participants.clear();
 		voiceRecorder.stop();
+		board->Clear();
+	}
 
 }
 
@@ -47,7 +56,7 @@ void Meeting::SetLine(int y, array<sf::Color, BASE_DRAW_SCREEN_W>& pixels)
 
 void Meeting::AddParticipant(uint32_t uid, ParticipentType pType)
 {
-	participants[uid] = new Participant(uid, participantsCount++, participentsScreen);
+	participants[uid] = new Participant(uid, participantsCount++, participentsScreen, this->client);
 	participants[uid]->SetParticipentType(pType);
 	participants[uid]->SetButtonMode(this->participentType == ParticipentType::Host);
 	if (participentType == ParticipentType::Host) {
@@ -71,11 +80,13 @@ void Meeting::RemoveParticipant(uint32_t uid)
 	if (toRemove == participants.end())
 		return;
 	int pos = toRemove->second->GetPosition();
+	auto temp = toRemove->second;
 	toRemove->second->RemoveFromScreen(participentsScreen);
 	participants.erase(toRemove);
 	for (auto p : participants) {
 		p.second->CorrectPosition(pos);
 	}
+	delete temp;
 	participantsCount--;
 }
 
@@ -106,6 +117,16 @@ void Meeting::SetParticipentType(uint32_t uid, ParticipentType participentType)
 		if (pr == participants.end())
 			return;
 		pr->second->SetParticipentType(participentType);
+	}
+}
+
+void Meeting::ChangeRecorderState(bool active)
+{
+	if (active) {
+		voiceRecorder.start(SampleRate);
+	}
+	else {
+		voiceRecorder.stop();
 	}
 }
 

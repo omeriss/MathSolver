@@ -64,6 +64,14 @@ void Screen::RemoveElement(UiElement* element)
 	elements.erase(std::remove(elements.begin(), elements.end(), element), elements.end());
 }
 
+void Screen::clear()
+{
+	for (auto elem : elements) {
+		delete elem;
+	}
+	elements.clear();
+}
+
 void Screen::UdpateScreen()
 {
 	if (!isActive)
@@ -91,6 +99,21 @@ void Screen::DrawScreen()
 void Screen::SetActive(bool isActive)
 {
 	this->isActive = isActive;
+}
+
+bool Screen::IsActive()
+{
+	return isActive;
+}
+
+void Screen::SwapUiElements(std::vector<UiElement*>& elements)
+{
+	std::swap(elements, this->elements);
+}
+
+sf::FloatRect Screen::GetPort()
+{
+	return view.getViewport();
 }
 
 UiElement* Screen::GetElementByName(std::string name)

@@ -151,6 +151,8 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="DrawScreen.cpp" />
+    <ClCompile Include="EquationAnalizer.cpp" />
+    <ClCompile Include="NetworkProtocol.cpp" />
     <ClCompile Include="NeuralNetwork.cpp" />
     <ClCompile Include="ScrollBar.cpp" />
     <ClCompile Include="TCP.cpp" />
@@ -173,6 +175,8 @@
     <ClInclude Include="Button.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="DrawScreen.h" />
+    <ClInclude Include="EquationAnalizer.h" />
+    <ClInclude Include="NetworkProtocol.h" />
     <ClInclude Include="NeuralNetwork.h" />
     <ClInclude Include="ScrollBar.h" />
     <ClInclude Include="TCP.h" />
@@ -190,6 +194,9 @@
     <ClInclude Include="UDP.h" />
     <ClInclude Include="UiElement.h" />
     <ClInclude Include="UiManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
