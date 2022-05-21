@@ -37,7 +37,7 @@
   <Class Name="Graph">
     <Position X="13.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>iAQwAgAAAAAAAAAAAAAIAAAIgAAAAAgACEAgAAAEAAA=</HashCode>
+      <HashCode>iAQwAgAAAAAAAAAAAAAIAAAJgAAAAAgACEAgAAAEAAA=</HashCode>
       <FileName>Graph.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -58,7 +58,7 @@
   <Class Name="TextBox">
     <Position X="7.75" Y="6.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAQAAAACAAIAEAAIABAgAAAAAAABAgAIAAAAAACEAAA=</HashCode>
+      <HashCode>AAQAAAACAAIAEAAIAFAgAAAAAAABAgAIAAAAAADEAAA=</HashCode>
       <FileName>TextBox.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -70,7 +70,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Participant">
-    <Position X="15.25" Y="10.5" Width="1.5" />
+    <Position X="15.5" Y="8.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAiQEAAAACAAEMAAAAAABIABAAAAAAAACCACAAFAIAA=</HashCode>
       <FileName>Meeting.h</FileName>
@@ -93,17 +93,17 @@
     <Position X="0.5" Y="8.5" Width="1.5" />
     <AssociationLine Name="boardScreen" Type="Screen">
       <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-0.403" Y="0.265" />
+        <Position X="-0.475" Y="0.281" />
       </MemberNameLabel>
     </AssociationLine>
     <AssociationLine Name="participentsScreen" Type="Screen">
       <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-0.328" Y="0.245" />
+        <Position X="-0.623" Y="0.525" />
       </MemberNameLabel>
     </AssociationLine>
     <AssociationLine Name="toolsScreen" Type="Screen">
       <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-0.463" Y="0.737" />
+        <Position X="-0.487" Y="0.681" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
@@ -114,13 +114,13 @@
       <Field Name="boardScreen" />
       <Field Name="participentsScreen" />
       <Field Name="toolsScreen" />
-      <Field Name="board" />
       <Field Name="client" />
       <Field Name="voiceRecorder" />
+      <Field Name="board" />
     </ShowAsAssociation>
   </Class>
   <Class Name="NeuralNetwork">
-    <Position X="8" Y="11" Width="1.5" />
+    <Position X="10.25" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>QAAAAgAgAAAAAAEAAQAAAAQAAAAAABAAAAIAjAAAAAA=</HashCode>
       <FileName>NeuralNetwork.h</FileName>
@@ -130,20 +130,16 @@
     <Position X="5.5" Y="1.25" Width="1.5" />
     <AssociationLine Name="meeting" Type="Meeting" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="5.5" Y="3.615" />
-        <Point X="5.125" Y="3.615" />
+        <Point X="5.5" Y="4.321" />
+        <Point X="5.125" Y="4.321" />
         <Point X="5.125" Y="5.75" />
-        <Point X="5.083" Y="5.75" Type="JumpStart" />
-        <Point X="4.917" Y="5.75" Type="JumpEnd" />
-        <Point X="4" Y="5.75" />
-        <Point X="4" Y="8.826" />
-        <Point X="2.49" Y="8.826" Type="JumpStart" />
-        <Point X="2.323" Y="8.826" Type="JumpEnd" />
+        <Point X="3.25" Y="5.75" />
+        <Point X="3.25" Y="8.826" />
         <Point X="2" Y="8.826" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAQAIAAAECAgAAABAAAAAAAABAJAgAAIAAAiAAAgQAE=</HashCode>
+      <HashCode>AAQAIAAAECAgAAABAAEEAAAABAJggACIAAAiAAEgQAE=</HashCode>
       <FileName>UiManager.h</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -151,28 +147,110 @@
       <Field Name="meeting" />
     </ShowAsAssociation>
   </Class>
+  <Class Name="Client">
+    <Position X="1.25" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAwCAAAAAAAAAAAAAAAAAIAAAAAAAAAAQEAgAAAAIAQ=</HashCode>
+      <FileName>Client.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="tcp" />
+      <Field Name="udp" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="EquationAnalizer">
+    <Position X="8" Y="11.25" Width="1.5" />
+    <AssociationLine Name="network" Type="NeuralNetwork">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.037" Y="0.069" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAIAAAQAABAQAAAAAAAAAIBhAAAAAAAABAEAAAAABAA=</HashCode>
+      <FileName>EquationAnalizer.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="network" />
+    </ShowAsAssociation>
+  </Class>
   <Class Name="DrawScreen">
-    <Position X="4.25" Y="6" Width="1.5" />
+    <Position X="3.5" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AIQEIAgAgIEAAgEAAIAAABAAAAABAkAAKEoAEhDEFAE=</HashCode>
       <FileName>DrawScreen.h</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="clinet" />
+      <Field Name="equationAnalizer" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="Client">
-    <Position X="1.25" Y="13.75" Width="1.5" />
+  <Class Name="TCP">
+    <Position X="1" Y="19" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAwCAAAAAAAAAAAAAAAAAIAAAAAAAAAAQEAgAAAAIAQ=</HashCode>
-      <FileName>Client.h</FileName>
+      <HashCode>AAQAAAAAAAAAEAIAAAAAAAEAAAAAAAAAAAEAAAEAIAA=</HashCode>
+      <FileName>TCP.h</FileName>
     </TypeIdentifier>
+  </Class>
+  <Class Name="TSUM&lt;KeyType, ValType&gt;">
+    <Position X="6.25" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAEAAABABAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UDP.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UDP">
+    <Position X="3.75" Y="18.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAEAAAAASAAAAAAAAAAAAAAAAAAEAAEAAAEAIAA=</HashCode>
+      <FileName>UDP.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="readData" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="NetworkProtocol">
+    <Position X="9.75" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAEACAAAAAEAACAAAAEAAAAMAAgA=</HashCode>
+      <FileName>NetworkProtocol.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PacketExecutor">
+    <Position X="12" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAQAAAAAAAAAAAAAAAACABAFAAAAAAEAgBgAAIAA=</HashCode>
+      <FileName>PacketExecutor.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Packet">
+    <Position X="14.5" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABQAEABAAACAAEAAAAAAAAAAMAAAAAAQAAEAACA=</HashCode>
+      <FileName>Packet.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="header" />
+    </ShowAsAssociation>
   </Class>
   <Struct Name="CalcElement">
     <Position X="15.75" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>Graph.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="UdpReadData">
+    <Position X="6.75" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAABEAAAAAAA=</HashCode>
+      <FileName>UDP.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Header">
+    <Position X="11.75" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>Packet.h</FileName>
     </TypeIdentifier>
   </Struct>
   <Enum Name="OriginType">
@@ -189,15 +267,8 @@
       <FileName>Screen.h</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="__unnamed_enum_001a_1">
-    <Position X="7.5" Y="16.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAAAAAAAgCBAAACAAAAAA=</HashCode>
-      <FileName>TextBox.h</FileName>
-    </TypeIdentifier>
-  </Enum>
   <Enum Name="ParticipentType">
-    <Position X="20.25" Y="14.75" Width="1.5" />
+    <Position X="15" Y="16.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAIAAAAAAAAAQAAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
       <FileName>Meeting.h</FileName>

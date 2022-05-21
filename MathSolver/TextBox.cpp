@@ -59,20 +59,24 @@ void TextBox::Update(sf::RenderWindow& window)
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 		if (InsideSprite(mousePos)) {
 			writeMode = true;
-
-			int tLen = text.getString().getSize();
-			onChar = -1;
-			for (int i = 1; i <= tLen; i++) {
-				if (mousePos.x < text.findCharacterPos(i).x && (mousePos.y < text.findCharacterPos(i).y + text.getCharacterSize() || !(type == Text))) {
-					onChar = i - 1;
-					if (text.findCharacterPos(i).x - mousePos.x > mousePos.x - text.findCharacterPos(i - 1).x)
-						onChar--;
-					break;
+			if (type != Password) {
+				onChar = -1;
+				int tLen = text.getString().getSize();
+				for (int i = 1; i <= tLen; i++) {
+					if (mousePos.x < text.findCharacterPos(i).x && (mousePos.y < text.findCharacterPos(i).y + text.getCharacterSize() || !(type == Text))) {
+						onChar = i - 1;
+						if (text.findCharacterPos(i).x - mousePos.x > mousePos.x - text.findCharacterPos(i - 1).x)
+							onChar--;
+						break;
+					}
+					else if ((mousePos.y < text.findCharacterPos(i).y + text.getCharacterSize() || !(type == Text)) && (i == tLen || text.findCharacterPos(i).y != text.findCharacterPos(i + 1).y)) {
+						onChar = i - 1;
+						break;
+					}
 				}
-				else if ((mousePos.y < text.findCharacterPos(i).y + text.getCharacterSize() || !(type == Text)) && (i == tLen || text.findCharacterPos(i).y != text.findCharacterPos(i + 1).y)) {
-					onChar = i-1;
-					break;
-				}
+			}
+			else {
+				onChar = text.getString().getSize() - 1;
 			}
 		}
 		else {
@@ -125,21 +129,19 @@ void TextBox::Update(sf::RenderWindow& window)
 
 void TextBox::Print(sf::RenderWindow& window)
 {
+	sf::String temp;
+	if (type == Password) {
+		temp = text.getString();
+		sf::String passText = text.getString();
+		for (auto& c : passText)
+			c = '*';
+		text.setString(passText);
+	}
+
 	window.draw(sprite);
 	if (text.getString().getSize() == 0 && !writeMode)
 		window.draw(tempTxt);
 	else {
-		/*
-		if (type == Password) {
-			sf::String passText = text.getString();
-			for (auto& c : passText)
-				c = '*';
-			text.setString(passText);
-			window.draw(text);
-		}
-		else
-			window.draw(text);
-		*/
 		window.draw(text);
 	}
 
@@ -153,6 +155,9 @@ void TextBox::Print(sf::RenderWindow& window)
 		PosRect.setPosition(RectPos);
 		window.draw(PosRect);
 	}
+
+	if (type == Password)
+		text.setString(temp);
 }
 
 void TextBox::SetPosition(sf::Vector2f position)

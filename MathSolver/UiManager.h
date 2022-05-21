@@ -9,6 +9,9 @@
 #include <string>
 #include <algorithm>
 #include <Windows.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/embed.h>
+#include <Python.h>
 #include "UiElement.h"
 #include "TextBox.h"
 #include "Screen.h"
@@ -39,9 +42,13 @@ private:
 	static UiManager* instance;
 	UiManager(UiManager& other) = delete;
 	void operator=(const UiManager&) = delete;
+	void DoLogIn();
+	void DoSignUp();
 	Meeting* meeting;
 	std::map<std::string,Screen*> screens;
 	sf::RenderWindow* window;
 	sf::Vector2u lastWindowSize;
+	asio::io_context pythonContext;
+	pybind11::module_ fireBaseModule;
+	std::string userName;
 };
-

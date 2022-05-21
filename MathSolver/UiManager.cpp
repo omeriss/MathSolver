@@ -2,6 +2,7 @@
 
 UiManager::UiManager()
 {
+    this->userName = "";
 }
 
 UiManager* UiManager::GetInstance()
@@ -68,32 +69,149 @@ void UiManager::Init()
     InitScreens();
 }
 
-std::vector<CalcElement> testFunc(string s) {
-    std::vector<CalcElement> v;
-    for (int i = 0; i < s.length(); i++) {
-        if (s[i] <= '9' && s[i] >= '0') {
-            CalcElement t;
-            t.IsNum = true;
-            t.Element.num = s[i] - '0';
-            v.push_back(t);
+void UiManager::DoLogIn()
+{
+    std::string email = ((TextBox*)screens["01logIn"]->GetElementByName("email"))->GetText();
+    std::string password = ((TextBox*)screens["01logIn"]->GetElementByName("password"))->GetText();
+    pythonContext.post([this, email, password]() {
+        ((TextBox*)screens["01logIn"]->GetElementByName("error"))->SetString("");
+        auto log_in = fireBaseModule.attr("log_in");
+        this->userName = pybind11::cast<std::string>(log_in(email.c_str(), password.c_str()));
+        if (this->userName == "") {
+            ((TextBox*)screens["01logIn"]->GetElementByName("error"))->SetString("Wrong email or password");
         }
         else {
-            CalcElement t;
-            t.IsNum = false;
-            t.Element.op = s[i];
-            v.push_back(t);
+            screens["01logIn"]->SetActive(false); screens["00main"]->SetActive(true);
         }
-    }
-    return v;
+    });
+}
+
+void UiManager::DoSignUp()
+{
+    std::string tempUserName = ((TextBox*)screens["01signUp"]->GetElementByName("username"))->GetText();
+    std::string email = ((TextBox*)screens["01signUp"]->GetElementByName("email"))->GetText();
+    std::string password = ((TextBox*)screens["01signUp"]->GetElementByName("password"))->GetText();
+    std::string confirmPassword = ((TextBox*)screens["01signUp"]->GetElementByName("confirmPassword"))->GetText();
+    pythonContext.post([this, tempUserName, email, password, confirmPassword]() {
+        ((TextBox*)screens["01signUp"]->GetElementByName("error"))->SetString("");
+        auto sign_up = fireBaseModule.attr("sign_up");
+        std::string errorString = pybind11::cast<std::string>(sign_up(tempUserName.c_str(), email.c_str(), password.c_str(), confirmPassword.c_str()));
+        if (errorString == "") {
+            this->userName = tempUserName;
+            screens["01signUp"]->SetActive(false); screens["00main"]->SetActive(true);
+        }
+        else {
+            ((TextBox*)screens["01signUp"]->GetElementByName("error"))->SetString(errorString);
+        }
+        });
 }
 
 void UiManager::InitScreens()
 {
+    Screen* EnterScreen = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, window, AlignCenter);
+    screens.insert({ "00Enter", EnterScreen });
+
+    Screen* LogInScreen = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, window, AlignCenter);
+    LogInScreen->SetActive(false);
+    screens.insert({ "01logIn", LogInScreen });
+
+    Screen* SignUpScreen = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, window, AlignCenter);
+    SignUpScreen->SetActive(false);
+    screens.insert({ "01signUp", SignUpScreen });
 
     Screen* MainScreen = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, window,AlignCenter);
-
+    MainScreen->SetActive(false);
     screens.insert({ "00main", MainScreen });
 
+    Screen* subScreenEq = new Screen(BASE_SCREEN_W,+ BASE_SCREEN_H, { 0.3, 0.3,0.5,0.5 }, window, SubScreen);
+    subScreenEq->SetActive(false);
+    screens.insert({ "09SubWindow", subScreenEq });
+
+    Screen* Open = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, {0,0,1,1}, window);
+    Open->SetActive(false);
+    screens.insert({ "01open", Open });
+
+    Screen* Join = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, { 0,0,1,1 }, window);
+    screens.insert({ "01join", Join });
+    Join->SetActive(false);
+
+    Screen* Draw = new Screen(BASE_DRAW_SCREEN_W, BASE_DRAW_SCREEN_H, { 0,1/6.0,5/6.0, 5 / 6.0 }, window, ScaleByWith);
+    Draw->SetActive(false);
+    screens.insert({ "03Draw", Draw });
+
+    Screen* tools = new Screen(BASE_DRAW_SCREEN_W*5.0/6.0, BASE_DRAW_SCREEN_H/6.0, { 0,0.0,5 / 6.0, 1 / 6.0 }, window, AlignLeft);
+    tools->SetActive(false);
+    screens.insert({ "03Tools", tools });
+
+    Screen* participents = new Screen(BASE_DRAW_SCREEN_W * 1.0 / 6, BASE_DRAW_SCREEN_H, { 5 / 6.0,0,1 / 6.0, 1 }, window, ScaleByWith);
+    participents->SetActive(false);
+    screens.insert({ "03Participents", participents });
+
+    // enter screen
+    Image* mathLinkImg = new Image(*UiElement::textureMap["MathLinkLogo"], { BASE_SCREEN_W / 2, BASE_SCREEN_H / 5 }, { 700, 350 });
+    mathLinkImg->SetOrigin(Center);
+    EnterScreen->AddElement(mathLinkImg);
+    Button* singUpButton = new Button(*UiElement::textureMap["logInButton"],
+        [this](){screens["00Enter"]->SetActive(false); screens["01logIn"]->SetActive(true); Sleep(100); },
+        { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 3 }, { 200 * 4.3, 200 });
+    singUpButton->SetOrigin(Center);
+    EnterScreen->AddElement(singUpButton);
+    Button* logInButon = new Button(*UiElement::textureMap["signUpButton"],
+        [this]() {screens["00Enter"]->SetActive(false); screens["01signUp"]->SetActive(true); Sleep(100); },
+        { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 4.5 }, { 200 * 4.3, 200 });
+    logInButon->SetOrigin(Center);
+    EnterScreen->AddElement(logInButon);
+
+    // sign up screen
+    TextBox* userNameTextBox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 * 0.5 }, { 800, 130 }, "Enter UserName", sf::Color::Black, 60);
+    userNameTextBox->SetOrigin(Center);
+    userNameTextBox->SetName("username");
+    SignUpScreen->AddElement(userNameTextBox);
+    TextBox* signUpEmailTextBox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 * 1.1 }, { 800, 130 }, "Enter Email", sf::Color::Black, 60);
+    signUpEmailTextBox->SetOrigin(Center);
+    signUpEmailTextBox->SetName("email");
+    SignUpScreen->AddElement(signUpEmailTextBox);
+    TextBox* ogPasswordTextBox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 * 1.7 }, { 800, 130 }, "Enter Password", sf::Color::Black, 60, Password);
+    ogPasswordTextBox->SetOrigin(Center);
+    ogPasswordTextBox->SetName("password");
+    SignUpScreen->AddElement(ogPasswordTextBox);
+    SignUpScreen->AddElement(new Button(*UiElement::textureMap["backButton"], [this]() {screens["00Enter"]->SetActive(true); screens["01logIn"]->SetActive(false); }, { 150, 50 }, { 100, 100 }));
+    TextBox* confirmPasswordTextBox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 * 2.3 }, { 800, 130 }, "Confirm Password", sf::Color::Black, 60, Password);
+    confirmPasswordTextBox->SetOrigin(Center);
+    confirmPasswordTextBox->SetName("confirmPassword");
+    SignUpScreen->AddElement(confirmPasswordTextBox);
+    SignUpScreen->AddElement(new Button(*UiElement::textureMap["backButton"], [this]() {screens["00Enter"]->SetActive(true); screens["01signUp"]->SetActive(false); }, { 150, 50 }, { 100, 100 }));
+    TextBox* signUpError = new TextBox(*UiElement::textureMap["Empty"], UiElement::baseFont, { BASE_SCREEN_W / 2.3, BASE_SCREEN_H / 4 * 2.8 }, { 800/1.6, 130/1.6 }, "", sf::Color::Red, 40, NoEdit);
+    signUpError->SetOrigin(Center);
+    signUpError->SetName("error");
+    SignUpScreen->AddElement(signUpError);
+    Button* signUpButton = new Button(*UiElement::textureMap["signUpButton"],
+        [this]() {DoSignUp(); },
+        { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 5 }, { 200 * 4.3, 200 });
+    signUpButton->SetOrigin(Center);
+    SignUpScreen->AddElement(signUpButton);
+
+    // log in screen
+    TextBox* emailTextBox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 * 1.2  }, { 800, 130 }, "Enter Email", sf::Color::Black, 60);
+    emailTextBox->SetOrigin(Center);
+    emailTextBox->SetName("email");
+    LogInScreen->AddElement(emailTextBox);
+    TextBox* passwordTextBox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 * 2 }, { 800, 130 }, "Enter Password", sf::Color::Black, 60, Password);
+    passwordTextBox->SetOrigin(Center);
+    passwordTextBox->SetName("password");
+    LogInScreen->AddElement(passwordTextBox);
+    LogInScreen->AddElement(new Button(*UiElement::textureMap["backButton"], [this]() {screens["00Enter"]->SetActive(true); screens["01logIn"]->SetActive(false); }, { 150, 50 }, { 100, 100 }));
+    TextBox* logInError = new TextBox(*UiElement::textureMap["Empty"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 * 2.8 }, { 800/1.6, 130/1.6 }, "", sf::Color::Red, 40, NoEdit);
+    logInError->SetOrigin(Center);
+    logInError->SetName("error");
+    LogInScreen->AddElement(logInError);
+    Button* logInButton = new Button(*UiElement::textureMap["logInButton"],
+        [this]() {DoLogIn(); },
+        { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 5 }, { 200 * 4.3, 200 });
+    logInButton->SetOrigin(Center);
+    LogInScreen->AddElement(logInButton);
+
+    // main screen
     auto func = [this]() mutable {screens["00main"]->SetActive(false); screens["01open"]->SetActive(true); Sleep(100); return; };
     auto func1 = [this]() mutable {screens["00main"]->SetActive(false); screens["01join"]->SetActive(true); Sleep(100); return; };
     Button* b = new Button(*UiElement::textureMap["HostMeeting"], func, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 3 }, {200*4.3, 200});
@@ -105,20 +223,9 @@ void UiManager::InitScreens()
     b = new Button(*UiElement::textureMap["Settings"], func, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 5.4 }, { 200 * 4.3, 200 });
     b->SetOrigin(Center);
     MainScreen->AddElement(b);
-    Image* m = new Image(*UiElement::textureMap["MathLinkLogo"], { BASE_SCREEN_W / 2, BASE_SCREEN_H / 5 }, {700, 350});
-    m->SetOrigin(Center);
-    MainScreen->AddElement(m);
+    MainScreen->AddElement(mathLinkImg);
 
-    
-    Screen* subScreenEq = new Screen(BASE_SCREEN_W,+ BASE_SCREEN_H, { 0.3, 0.3,0.5,0.5 }, window, SubScreen);
-    subScreenEq->SetActive(false);
-    screens.insert({ "09SubWindow", subScreenEq });
-    
-    
-
-    Screen* Open = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, {0,0,1,1}, window);
-    screens.insert({ "01open", Open });
-    Open->SetActive(false);
+    // open room screen
     TextBox* textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, {BASE_SCREEN_W / 2, BASE_SCREEN_H/4}, {800, 130}, "Enter Room Code", sf::Color::Black, 60);
     textbox->SetOrigin(Center);
     textbox->SetName("RoomCode");
@@ -131,11 +238,10 @@ void UiManager::InitScreens()
     b = new Button(*UiElement::textureMap["HostMeeting"], confunc, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 5 }, { 200 * 4.3, 200 });
     b->SetOrigin(Center);
     Open->AddElement(b);
+    Open->AddElement(new Button(*UiElement::textureMap["backButton"], [this](){screens["00main"]->SetActive(true); screens["01open"]->SetActive(false); }, { 150, 50 }, { 100, 100 }));
 
 
-    Screen* Join = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, { 0,0,1,1 }, window);
-    screens.insert({ "01join", Join });
-    Join->SetActive(false);
+    // join room screen
     textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 }, { 800, 130 }, "Enter IP", sf::Color::Black, 60);
     textbox->SetOrigin(Center);
     textbox->SetName("ip");
@@ -150,24 +256,15 @@ void UiManager::InitScreens()
     b = new Button(*UiElement::textureMap["JoinMeeting"], confunc1, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 5 }, { 200 * 4.3, 200 });
     b->SetOrigin(Center);
     Join->AddElement(b);
-    
+    Join->AddElement(new Button(*UiElement::textureMap["backButton"], [this]() {screens["00main"]->SetActive(true); screens["01join"]->SetActive(false); }, { 150, 50 }, { 100, 100 }));
 
-    Screen* Draw = new Screen(BASE_DRAW_SCREEN_W, BASE_DRAW_SCREEN_H, { 0,1/6.0,5/6.0, 5 / 6.0 }, window, ScaleByWith);
-    Draw->SetActive(false);
-    screens.insert({ "03Draw", Draw });
+    
+    // draw screen
     DrawScreen* dsc = new DrawScreen({ 0,0 }, { BASE_DRAW_SCREEN_W, BASE_DRAW_SCREEN_H });
     dsc->SetName("board");
     Draw->AddElement(dsc);
 
-
-    Screen* tools = new Screen(BASE_DRAW_SCREEN_W*5.0/6.0, BASE_DRAW_SCREEN_H/6.0, { 0,0.0,5 / 6.0, 1 / 6.0 }, window, AlignLeft);
-    tools->SetActive(false);
-    screens.insert({ "03Tools", tools });
-
-    Screen* participents = new Screen(BASE_DRAW_SCREEN_W * 1.0 / 6, BASE_DRAW_SCREEN_H, { 5 / 6.0,0,1 / 6.0, 1 }, window, ScaleByWith);
-    participents->SetActive(false);
-    screens.insert({ "03Participents", participents });
-
+    // tools screen
     tools->AddElement(new Button(*UiElement::textureMap["blackButton"], 
         [changecolor = sf::Color(0, 0, 0), this](){ this->GetMeeting()->SetColor(changecolor);
         ((Image*)(screens["03Tools"]->GetElementByName("ImageColor")))->ChangeTexture(*UiElement::textureMap["blackButton"]); },
@@ -226,14 +323,31 @@ void UiManager::InitScreens()
     tools->AddElement(new ScrollBar([this](float val) { this->GetMeeting()->SetRadius(val); },
         {1, 10}, { 450, 49 }, { 1476 / 5.0,110 / 5.0 }));
 
+
+    // create meeting class
     meeting = new Meeting(Draw, participents, tools, subScreenEq, &cl);
 }
 
 void UiManager::Start()
 {
-    //string ip = "127.0.0.1";
-    //cl.Connect(ip, 16016);
+    asio::io_context::work pythonWork(pythonContext);
 
+    pybind11::gil_scoped_release release();
+    std::thread* pythonThread = new std::thread([this]() {
+        pybind11::gil_scoped_acquire acquire();
+        pybind11::scoped_interpreter gard{};
+        pythonContext.run();
+     });
+    pythonThread->detach();
+
+    pythonContext.post([this]() {
+        this->fireBaseModule = pybind11::module_::import("fireBaseModule");
+    });
+
+    pythonContext.post([this]() {
+        auto initFireBase = fireBaseModule.attr("init_firebase");
+        initFireBase();
+    });
     
     window = new sf::RenderWindow(sf::VideoMode(BASE_SCREEN_W, BASE_SCREEN_H), "Math Link");
     this->lastWindowSize = window->getSize();

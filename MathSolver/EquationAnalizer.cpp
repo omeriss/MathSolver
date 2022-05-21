@@ -79,8 +79,10 @@ std::vector<CalcElement> getPostFix(string s) {
 				ele.Element.op = s[i];
 			}
 			if (last == 0 || last == OPER) {
-				if (ele.Element.op == '-' && i < stringLen - 1 && ((s[i + 1] <= '9' && s[i + 1] >= '0') || s[i + 1] == 'x'))
+				if (ele.Element.op == '-' && i < stringLen - 1 && ((s[i + 1] <= '9' && s[i + 1] >= '0') || s[i + 1] == 'x')) {
 					mulBy = -1;
+					continue;
+				}
 				else
 					throw std::invalid_argument("Equation is wrong");
 			}
@@ -100,6 +102,146 @@ std::vector<CalcElement> getPostFix(string s) {
 	return result;
 }
 
+std::list<std::pair<double, double>> MulEq(std::list<std::pair<double, double>>& eq1, std::list<std::pair<double, double>>& eq2) {
+	std::list<std::pair<double, double>> newList;
+	for (auto& ex1 : eq1) {
+		for (auto& ex2 : eq2) {
+			newList.push_back({ex1.first * ex2.first, ex1.second + ex2.second});
+		}
+	}
+	return newList;
+}
+
+std::list<std::pair<double, double>> PostFixToEq(std::vector<CalcElement> postFix) {
+	std::stack<std::list<std::pair<double, double>>> equationStack;
+
+	// go over the postfix
+	for (auto part : postFix) {
+		if (part.IsNum) {
+			// push num: num*X*0
+			equationStack.push({ {part.Element.num, 0} });
+		}
+		else {
+			if (part.Element.op == 'x') {
+				// push x: 1*x^1
+				equationStack.push({ {1, 1} });
+			}
+			else {
+				if (part.Element.op == '^') {
+					if (equationStack.top().size() == 1 && equationStack.top().begin()->second == 0 && int(equationStack.top().begin()->first) - equationStack.top().begin()->first == 0) {
+						// check the ^
+						int count = equationStack.top().begin()->first;
+						equationStack.pop();
+						if (count == 0) {
+							equationStack.pop();
+							equationStack.push({ {1,0} });
+							continue;
+						}
+						auto oldlist = equationStack.top();
+						std::list<std::pair<double, double>> newlist = equationStack.top();
+						equationStack.pop();
+
+						// mul new one by it self
+						for (int i = 1; i < count; i++) {
+							newlist = MulEq(oldlist, newlist);
+						}
+						equationStack.push(newlist);
+					}
+					else {
+						throw "can't solve this";
+					}
+				}
+				else if (part.Element.op == '*') {
+					// do mul
+					auto eq1 = equationStack.top();
+					equationStack.pop();
+					auto eq2 = equationStack.top();
+					equationStack.pop();
+					equationStack.push(MulEq(eq1, eq2));
+				}
+				else if (part.Element.op == '/') {
+					// do div only if divisor is num
+					if (equationStack.top().size() == 1 && equationStack.top().begin()->second == 0) {
+						int divBy = equationStack.top().begin()->first;
+						equationStack.pop();
+						for (auto& eq : equationStack.top()) {
+							eq.first /= divBy;
+						}
+					}
+					else {
+						throw "can't solve this";
+					}
+				}
+				else if (part.Element.op == '+' or part.Element.op == '-') {
+					auto eq1 = equationStack.top();
+					equationStack.pop();
+					auto eq2 = equationStack.top();
+					equationStack.pop();
+					if (eq1.size() == 1 && eq1.begin()->second == 0 && eq2.size() == 1 && eq2.begin()->second == 0) {
+						if(part.Element.op == '+')
+							equationStack.push({ { eq1.begin()->first + eq2.begin()->first, 0} });
+						else
+							equationStack.push({ { eq2.begin()->first - eq1.begin()->first, 0} });
+					}
+					else {
+						if (part.Element.op == '-') {
+							// mul by -1
+							for (auto& eq : equationStack.top()) {
+								eq.first *= -1;
+							}
+						}
+						// do addition
+						eq2.insert(eq2.end(), eq1.begin(), eq1.end());
+						equationStack.push(eq2);
+					}
+				}
+				else {
+					throw "can't solve this";
+				}
+			}
+		}
+	}
+
+	return equationStack.top();
+}
+
+void addToEq(std::map<int, double>& fullEq, pair<double, double> item, int mulBy) {
+	if (item.second - int(item.second) != 0)
+		throw "can't solvet this";
+	int key = item.second;
+	auto mapPointer = fullEq.find(key);
+	if (mapPointer == fullEq.end()) {
+		fullEq[key] = item.first * mulBy;
+	}
+	else {
+		fullEq[key] += item.first * mulBy;
+	}
+}
+
+std::string SolveForX (std::string leftSide, std::string rightSide) {
+	// stack of list of pair - the pair represents (first)*X^(second) where first and second are the pair
+	try {
+		auto rightEq = PostFixToEq(getPostFix(rightSide));
+		auto leftEq = PostFixToEq(getPostFix(leftSide));
+		std::map<int, double> fullEq;
+		for (auto i : rightEq) {
+			addToEq(fullEq, i, 1);
+		}
+		for (auto i : leftEq) {
+			addToEq(fullEq, i, -1);
+		}
+		for (auto ex : fullEq) {
+			std::cout << ex.first << "x^" << ex.second << " + ";
+		}
+		return "";
+	}
+	catch(...){
+		std::cout << "can't solve this" << std::endl;
+		return "";
+	}
+
+
+}
 
 EquationAnalizer::EquationAnalizer()
 {
@@ -206,12 +348,17 @@ void EquationAnalizer::LoadFromImages(std::vector<std::pair<sf::IntRect, double*
 void EquationAnalizer::LoadFromString(std::string equation)
 {
 	std::string errorString = "";
+	bool hasX = false, hasY = false;
 	int splitIndex = -1;
 	for (int i = 0; i < equation.size(); i++) {
 		if (std::find(okCharsFromEqString.begin(), okCharsFromEqString.end(), equation[i]) == okCharsFromEqString.end()) {
 			errorString = "Equation is wrong";
 			break;
 		}
+
+		hasX = hasX || (equation[i] == 'x');
+		hasY = hasY || (equation[i] == 'y');
+
 		if (equation[i] == '=') {
 			if (splitIndex == -1)
 				splitIndex = i;
@@ -226,8 +373,16 @@ void EquationAnalizer::LoadFromString(std::string equation)
 	rightSide = equation.substr(splitIndex + 1, equation.size() - splitIndex - 1);
 
 	if (errorString == "") {
-		SwapScreens(false);
-		((Graph*)this->subScreen->GetElementByName("graph"))->SetFx(getPostFix(this->rightSide));
+		if (leftSide == "y") {
+			SwapScreens(false);
+			((Graph*)this->subScreen->GetElementByName("graph"))->SetFx(getPostFix(this->rightSide));
+		}
+		else if (!hasX && !hasY && rightSide == "") {
+
+		}
+		else if(!hasY) {
+			SolveForX(leftSide, rightSide);
+		}
 	}
 }
 
@@ -276,7 +431,7 @@ void EquationAnalizer::SetSubScreen(Screen* subScreen)
 	otherUiElements.push_back(dragBar);
 
 	std::vector<CalcElement> calcVector = {};
-	Graph* graphUiElement = new Graph({ BASE_SCREEN_W / 2, BASE_SCREEN_H / 3 * 1.7 }, { 1300, 800 }, calcVector);
+	Graph* graphUiElement = new Graph({ BASE_SCREEN_W / 2, BASE_SCREEN_H / 3 * 1.7 }, { 1500, 900 }, calcVector);
 	graphUiElement->SetOrigin(Center);
 	graphUiElement->SetName("graph");
 	otherUiElements.push_back(graphUiElement);

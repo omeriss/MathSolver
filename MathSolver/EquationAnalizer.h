@@ -5,6 +5,7 @@
 #include <stack>
 #include <algorithm>
 #include <regex>
+#include <map>
 #include "Screen.h"
 #include "NeuralNetwork.h"
 #include "Graph.h"
@@ -23,7 +24,7 @@ static std::unordered_map<char, int> opRank = {
 	{'^', 2}
 };
 
-static std::vector okCharsFromEqString = { '0','1','2','3','4','5','6','7','8','9','+','-', '/', '^', '*', 'x', 'y', '='};
+static std::vector okCharsFromEqString = { '0','1','2','3','4','5','6','7','8','9','+','-', '/', '^', '*', 'x', 'y', '=', '(', ')'};
 
 class EquationAnalizer
 {

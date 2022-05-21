@@ -23,7 +23,7 @@ public:
         participentsScreen->AddElement(UserRec);
 
         userName = new TextBox(*UiElement::textureMap["Empty"], UiElement::baseFont, { Start_Offset_x + User_Name_Offset_X, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y + UserName_Offset_From_Button_Top},
-            { User_Lable_Size_x, User_Lable_Size_y - User_Name_Offset_X }, "omeriss", sf::Color::Black, User_Name_Font_Size, NoEdit);
+            { User_Lable_Size_x, User_Lable_Size_y - User_Name_Offset_X }, (uid == 1)?"omeriss":"tom", sf::Color::Black, User_Name_Font_Size, NoEdit);
         participentsScreen->AddElement(userName);
 
         canDraw = new ToggleButton(*UiElement::textureMap["notEditorButton"], *UiElement::textureMap["editorButton"],

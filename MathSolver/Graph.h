@@ -22,6 +22,7 @@ class Graph :
 public:
 	Graph(sf::Vector2f pos, sf::Vector2f size, std::vector<CalcElement>& Fx);
 	void Update(sf::RenderWindow& window);
+	void ReDrawGraph();
 	void Print(sf::RenderWindow& window);
 	void MoveGraph(sf::RenderWindow& window);
 	void SetFx(std::vector<CalcElement> Fx);

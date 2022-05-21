@@ -10,8 +10,8 @@
 // graph
 
 #define StartGraphXW 10
-#define GraphDensity 10000
-#define AsymptoteThreshold 3000
+#define GraphDensity 3000
+#define AsymptoteThreshold 1500
 
 // draw screen
 

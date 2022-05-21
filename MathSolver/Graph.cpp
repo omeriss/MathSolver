@@ -36,6 +36,12 @@ void Graph::Update(sf::RenderWindow& window)
 	if (!UpdateNextFrame)
 		return;
 
+	ReDrawGraph();
+	UpdateNextFrame = false;
+}
+
+void Graph::ReDrawGraph()
+{
 	bool LastPointExists = true;
 	int GoingUp = -1;
 	float LastY;
@@ -44,20 +50,20 @@ void Graph::Update(sf::RenderWindow& window)
 
 	renderTex.clear(sf::Color::Black);
 
-	int i = -GraphDensity/2;
-	while (i < GraphDensity && !(ans = Calc(GraphView.getCenter().x / (1.0f * renderTex.getSize().x / xWeight) + ((float)i++)*(1.0f* xWeight / (1.0f * GraphDensity + !(GraphDensity % 2))))).second) {}
+	int i = -GraphDensity / 2;
+	while (i < GraphDensity && !(ans = Calc(GraphView.getCenter().x / (1.0f * renderTex.getSize().x / xWeight) + ((float)i++) * (1.0f * xWeight / (1.0f * GraphDensity + !(GraphDensity % 2))))).second) {}
 	LastY = ans.first;
 	float temp = GraphView.getCenter().x / (1.0f * renderTex.getSize().x / xWeight) + ((float)i) * (1.0f * xWeight / (1.0f * GraphDensity + !(GraphDensity % 2)));
 	line[0] = sf::Vector2f(temp * (1.0f * renderTex.getSize().x / xWeight), (-ans.first * (1.0f * renderTex.getSize().x / xWeight)));
 	line[0].color = sf::Color::Red;
 
-	for (; i <= GraphDensity/2; i++) {
+	for (; i <= GraphDensity / 2; i++) {
 		float x = GraphView.getCenter().x / (1.0f * renderTex.getSize().x / xWeight) + ((float)i) * (1.0f * xWeight / (1.0f * GraphDensity + !(GraphDensity % 2)));
 		ans = Calc(x);
-		line[1] = sf::Vector2f(x*(1.0f* renderTex.getSize().x / xWeight), (-ans.first *(1.0f* renderTex.getSize().x / xWeight)));
+		line[1] = sf::Vector2f(x * (1.0f * renderTex.getSize().x / xWeight), (-ans.first * (1.0f * renderTex.getSize().x / xWeight)));
 		line[1].color = sf::Color::Red;
 		if (LastPointExists && ans.second) {
-			if (GoingUp != (LastY < ans.first) && (LastY < 0) != (ans.first < 0) && abs(LastY - ans.first) > 1.0*AsymptoteThreshold/xWeight) {
+			if (GoingUp != (LastY < ans.first) && (LastY < 0) != (ans.first < 0) && abs(LastY - ans.first) > 1.0 * AsymptoteThreshold / xWeight) {
 				GoingUp = LastY < ans.first;
 				LastY = ans.first;
 				LastPointExists = false;
@@ -101,7 +107,6 @@ void Graph::Update(sf::RenderWindow& window)
 		renderTex.draw(tempLineY, 2, sf::Lines);
 	}
 	renderTex.display();
-	UpdateNextFrame = false;
 }
 
 void Graph::Print(sf::RenderWindow& window)
@@ -139,6 +144,9 @@ void Graph::MoveGraph(sf::RenderWindow& window)
 void Graph::SetFx(std::vector<CalcElement> Fx)
 {
 	this->Fx = Fx;
+	xWeight = StartGraphXW;
+	GraphView.setCenter(0, 0);
+	ReDrawGraph();
 }
 
 pair<float, bool> getVal(float a, float b, char op) {
