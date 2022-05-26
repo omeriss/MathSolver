@@ -2,6 +2,8 @@
 
 Meeting::Meeting(Screen* boardS, Screen* paricipentsS, Screen* toolsS, Screen* subScreen, Client* cl):voiceRecorder(cl)
 {
+
+	// set screens
 	this->boardScreen = boardS;
 	this->participentsScreen = paricipentsS;
 	this->toolsScreen = toolsS;
@@ -10,6 +12,8 @@ Meeting::Meeting(Screen* boardS, Screen* paricipentsS, Screen* toolsS, Screen* s
 	board->SetClinet(cl);
 	((DrawScreen*)boardS->GetElementByName("board"))->SetSubScreen(subScreen);
 	//participants[0] = new Participant(0, 0, paricipentsS);
+
+	this->userName = "";
 }
 
 void Meeting::SetActive(bool state)
@@ -19,6 +23,19 @@ void Meeting::SetActive(bool state)
 	participentsScreen->SetActive(isActive);
 	toolsScreen->SetActive(isActive);
 	if (state == true) {
+		std::cout << "Joined meeting with room code:" << roomCode << std::endl;
+		// copy to clipboard
+		OpenClipboard(0);
+		EmptyClipboard();
+		HGLOBAL copyString = GlobalAlloc(GMEM_MOVEABLE, roomCode.size()+1);
+		if (copyString) {
+			std::memcpy(GlobalLock(copyString), roomCode.c_str(), roomCode.size()+1);
+			GlobalUnlock(copyString);
+			SetClipboardData(CF_TEXT, copyString);
+			CloseClipboard();
+			GlobalFree(copyString);
+		}
+
 		if (sf::SoundBufferRecorder::getAvailableDevices().size() >= 1 && sf::Keyboard::isKeyPressed(sf::Keyboard::Tab)) {
 			for (auto u : sf::SoundBufferRecorder::getAvailableDevices()) {
 				std::cout << u << "\n";
@@ -34,7 +51,9 @@ void Meeting::SetActive(bool state)
 		voiceRecorder.start(SampleRate);
 	}
 	else {
+		// reset meeting
 		for (auto p : participants) {
+			p.second->RemoveFromScreen(participentsScreen);
 			delete p.second;
 		}
 		participants.clear();
@@ -54,9 +73,10 @@ void Meeting::SetLine(int y, array<sf::Color, BASE_DRAW_SCREEN_W>& pixels)
 	board->SetLine(y, pixels);
 }
 
-void Meeting::AddParticipant(uint32_t uid, ParticipentType pType)
+void Meeting::AddParticipant(uint32_t uid, ParticipentType pType, std::string nUserName)
 {
-	participants[uid] = new Participant(uid, participantsCount++, participentsScreen, this->client);
+	// add the new data
+	participants[uid] = new Participant(uid, nUserName, participantsCount++, participentsScreen, this->client);
 	participants[uid]->SetParticipentType(pType);
 	participants[uid]->SetButtonMode(this->participentType == ParticipentType::Host);
 	if (participentType == ParticipentType::Host) {
@@ -76,6 +96,8 @@ void Meeting::AddParticipant(uint32_t uid, ParticipentType pType)
 
 void Meeting::RemoveParticipant(uint32_t uid)
 {
+
+	// remove a participent
 	auto toRemove = participants.find(uid);
 	if (toRemove == participants.end())
 		return;
@@ -104,6 +126,7 @@ void Meeting::SetColor(sf::Color color)
 
 void Meeting::SetParticipentType(uint32_t uid, ParticipentType participentType)
 {
+	// change the type
 	if (uid == selfId) {
 		this->participentType = participentType;
 		board->SetDrawMode(participentType >= ParticipentType::Editor);
@@ -129,6 +152,20 @@ void Meeting::ChangeRecorderState(bool active)
 		voiceRecorder.stop();
 	}
 }
+
+void Meeting::AppendRoomCode(std::string code, bool restart)
+{
+	if (restart)
+		roomCode = code;
+	else
+		roomCode += code;
+}
+
+std::string& Meeting::GetUsername()
+{
+	return userName;
+}
+
 
 void Meeting::SetSelfId(uint32_t selfId)
 {

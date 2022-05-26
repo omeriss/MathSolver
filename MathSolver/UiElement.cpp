@@ -21,6 +21,8 @@ UiElement::UiElement()
 
 void UiElement::SetOrigin(OriginType origin)
 {
+
+	// set origin
 	switch (origin)
 	{
 	case TopLeft:
@@ -55,6 +57,8 @@ sf::Vector2f UiElement::GetPosition()
 
 bool UiElement::InsideSprite(sf::Vector2f pos)
 {
+	// chack if the pos inside the sprite 
+
 	return enableMouseClick && MouseInScreen && pos.x >= sprite.getPosition().x - sprite.getOrigin().x * sprite.getScale().x && pos.y >= sprite.getPosition().y - sprite.getOrigin().y * sprite.getScale().y
 		&& pos.x <= sprite.getPosition().x - sprite.getOrigin().x * sprite.getScale().x + sprite.getGlobalBounds().width
 		&& pos.y <= sprite.getPosition().y - sprite.getOrigin().y * sprite.getScale().y + sprite.getGlobalBounds().height;
@@ -63,6 +67,11 @@ bool UiElement::InsideSprite(sf::Vector2f pos)
 void UiElement::SetName(std::string name)
 {
 	this->name = name;
+}
+
+void UiElement::SetActive(bool isActive)
+{
+	this->IsActive = isActive;
 }
 
 std::string UiElement::GetName()

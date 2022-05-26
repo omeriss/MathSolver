@@ -19,6 +19,8 @@
 
 
 #pragma region define static members
+
+// all the static vars
 std::vector<char> UiElement::input = std::vector<char>();
 static std::map<std::string, sf::Texture*>* LoadTextures(std::string dirPath) {
     std::map<std::string, sf::Texture*>* textureMap = new std::map < std::string, sf::Texture*>();
@@ -45,8 +47,13 @@ sf::Font UiElement::baseFont = sf::Font();
 
 
 int main(){
+
+    // rand 
     srand(time(NULL));
+
     PacketExecutor::GetInstance()->SetFunctions(CreatePacketVector);
+
+    // start
     UiManager::GetInstance()->Start();
     return 0;
 }

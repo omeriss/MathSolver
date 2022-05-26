@@ -28,27 +28,52 @@
 class UiManager
 {
 public:
+
+	/// <summary>
+	/// singelton instance
+	/// </summary>
+	/// <returns></returns>
 	static UiManager* GetInstance();
+
+	/// <summary>
+	/// update events
+	/// </summary>
 	void UpdateSfmlEvents();
 	void Init();
 	void InitScreens();
 	void Start();
 	void Update();
 	Meeting* GetMeeting();
+
+	/// <summary>
+	/// get the screens
+	/// </summary>
+	/// <returns> the screens</returns>
 	std::map<std::string, Screen*>& GetScreens();
 	Client cl;
 private:
+
+	/// <summary>
+	/// constractor
+	/// </summary>
 	UiManager();
 	static UiManager* instance;
 	UiManager(UiManager& other) = delete;
 	void operator=(const UiManager&) = delete;
 	void DoLogIn();
 	void DoSignUp();
+
+	/// <summary>
+	/// the meeting class
+	/// </summary>
 	Meeting* meeting;
+	
+	/// <summary>
+	/// the screens
+	/// </summary>
 	std::map<std::string,Screen*> screens;
 	sf::RenderWindow* window;
 	sf::Vector2u lastWindowSize;
 	asio::io_context pythonContext;
 	pybind11::module_ fireBaseModule;
-	std::string userName;
 };

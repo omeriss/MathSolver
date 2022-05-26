@@ -52,7 +52,7 @@ void TextBox::SetString(std::string str)
 
 void TextBox::Update(sf::RenderWindow& window)
 {
-	if (type == NoEdit)
+	if (!IsActive || type == NoEdit)
 		return;
 
 	sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
@@ -129,6 +129,9 @@ void TextBox::Update(sf::RenderWindow& window)
 
 void TextBox::Print(sf::RenderWindow& window)
 {
+	if (!IsActive)
+		return;
+
 	sf::String temp;
 	if (type == Password) {
 		temp = text.getString();

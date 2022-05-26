@@ -22,6 +22,8 @@ void PacketExecutor::HandlePacket(uint32_t id, Packet* packet)
 
 void PacketExecutor::Udate()
 {
+
+    // make sure that this is not dont by 2 threads at the same time
     mutex.lock();
     while (!packetQueue.empty()) {
         tempQueue.push(packetQueue.front());

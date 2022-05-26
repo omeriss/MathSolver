@@ -21,6 +21,8 @@ Graph::Graph(sf::Vector2f pos, sf::Vector2f size, std::vector<CalcElement>& Fx)
 
 void Graph::Update(sf::RenderWindow& window)
 {
+	if (!IsActive)
+		return;
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
 		xWeight += 2;
@@ -111,6 +113,9 @@ void Graph::ReDrawGraph()
 
 void Graph::Print(sf::RenderWindow& window)
 {
+	if (!IsActive)
+		return;
+
 	sprite.setTexture(renderTex.getTexture());
 	window.draw(sprite);
 }
@@ -167,9 +172,11 @@ pair<float, bool> Graph::Calc(float x)
 	for (auto e : Fx)
 	{
 		if (e.IsNum) {
+			// add to the stack
 			s.push(e.Element.num);
 		}
 		else {
+			// replace x by number
 			if (e.Element.op == 'x')
 				s.push(x);
 			else {
@@ -177,9 +184,11 @@ pair<float, bool> Graph::Calc(float x)
 				s.pop();
 				float n2 = s.top();
 				s.pop();
+				// get the result of the operand on the 2 vals
 				pair<float, bool> temp = getVal(n2, n1, e.Element.op);
 				if (!temp.second)
 					return temp;
+				// add back to the stack
 				s.push(temp.first);
 			}
 		}

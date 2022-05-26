@@ -25,6 +25,12 @@
     <Filter Include="Source Files\GUI">
       <UniqueIdentifier>{38a6a6aa-5f40-4d5c-8d8e-d63c8a38a90c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\NeuralNetwork">
+      <UniqueIdentifier>{c1f9ab95-884a-41af-94a8-a7c200095787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NeuralNetwork">
+      <UniqueIdentifier>{d3c00484-6a69-4d09-8955-fff84d6f83fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -75,9 +81,6 @@
     <ClCompile Include="DrawScreen.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="NeuralNetwork.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ScrollBar.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
@@ -92,6 +95,21 @@
     </ClCompile>
     <ClCompile Include="EquationAnalizer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ActivationFunction.cpp">
+      <Filter>Source Files\NeuralNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvolutionalLayer.cpp">
+      <Filter>Source Files\NeuralNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="FullyConnectedLayer.cpp">
+      <Filter>Source Files\NeuralNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="Layer.cpp">
+      <Filter>Source Files\NeuralNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuralNetwork.cpp">
+      <Filter>Source Files\NeuralNetwork</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -143,9 +161,6 @@
     <ClInclude Include="DrawScreen.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="NeuralNetwork.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ScrollBar.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
@@ -160,6 +175,24 @@
     </ClInclude>
     <ClInclude Include="EquationAnalizer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetwork.h">
+      <Filter>Header Files\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="FullyConnectedLayer.h">
+      <Filter>Header Files\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvolutionalLayer.h">
+      <Filter>Header Files\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="ActivationFunction.h">
+      <Filter>Header Files\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>Header Files\NeuralNetwork</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

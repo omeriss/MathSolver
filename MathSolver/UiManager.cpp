@@ -2,7 +2,6 @@
 
 UiManager::UiManager()
 {
-    this->userName = "";
 }
 
 UiManager* UiManager::GetInstance()
@@ -76,8 +75,9 @@ void UiManager::DoLogIn()
     pythonContext.post([this, email, password]() {
         ((TextBox*)screens["01logIn"]->GetElementByName("error"))->SetString("");
         auto log_in = fireBaseModule.attr("log_in");
-        this->userName = pybind11::cast<std::string>(log_in(email.c_str(), password.c_str()));
-        if (this->userName == "") {
+        std::string& userName = meeting->GetUsername();
+        userName = pybind11::cast<std::string>(log_in(email.c_str(), password.c_str()));
+        if (userName == "") {
             ((TextBox*)screens["01logIn"]->GetElementByName("error"))->SetString("Wrong email or password");
         }
         else {
@@ -97,7 +97,8 @@ void UiManager::DoSignUp()
         auto sign_up = fireBaseModule.attr("sign_up");
         std::string errorString = pybind11::cast<std::string>(sign_up(tempUserName.c_str(), email.c_str(), password.c_str(), confirmPassword.c_str()));
         if (errorString == "") {
-            this->userName = tempUserName;
+            std::string& userName = meeting->GetUsername();
+            userName = tempUserName;
             screens["01signUp"]->SetActive(false); screens["00main"]->SetActive(true);
         }
         else {
@@ -127,9 +128,9 @@ void UiManager::InitScreens()
     subScreenEq->SetActive(false);
     screens.insert({ "09SubWindow", subScreenEq });
 
-    Screen* Open = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, {0,0,1,1}, window);
-    Open->SetActive(false);
-    screens.insert({ "01open", Open });
+    //Screen* Open = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, {0,0,1,1}, window);
+    //Open->SetActive(false);
+    //screens.insert({ "01open", Open });
 
     Screen* Join = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, { 0,0,1,1 }, window);
     screens.insert({ "01join", Join });
@@ -146,6 +147,10 @@ void UiManager::InitScreens()
     Screen* participents = new Screen(BASE_DRAW_SCREEN_W * 1.0 / 6, BASE_DRAW_SCREEN_H, { 5 / 6.0,0,1 / 6.0, 1 }, window, ScaleByWith);
     participents->SetActive(false);
     screens.insert({ "03Participents", participents });
+
+    Screen* settingsScreen = new Screen(BASE_SCREEN_W, BASE_SCREEN_H, window, AlignCenter);
+    settingsScreen->SetActive(false);
+    screens.insert({ "10settings", settingsScreen });
 
     // enter screen
     Image* mathLinkImg = new Image(*UiElement::textureMap["MathLinkLogo"], { BASE_SCREEN_W / 2, BASE_SCREEN_H / 5 }, { 700, 350 });
@@ -212,47 +217,70 @@ void UiManager::InitScreens()
     LogInScreen->AddElement(logInButton);
 
     // main screen
-    auto func = [this]() mutable {screens["00main"]->SetActive(false); screens["01open"]->SetActive(true); Sleep(100); return; };
-    auto func1 = [this]() mutable {screens["00main"]->SetActive(false); screens["01join"]->SetActive(true); Sleep(100); return; };
-    Button* b = new Button(*UiElement::textureMap["HostMeeting"], func, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 3 }, {200*4.3, 200});
+    auto openRoomFunc = [this]() mutable {this->pythonContext.post([this]() {
+        auto get_create_server = fireBaseModule.attr("get_create_server");
+        pybind11::tuple tup = get_create_server();
+        std::string ip = pybind11::cast<string>(*tup.begin());
+        int port = pybind11::cast<int>(*(tup.begin() + 1));
+        if (ip != "") {
+            meeting->AppendRoomCode(pybind11::cast<std::string>(*(tup.begin() + 2)), true);
+            cl.Connect(ip, port, this->GetMeeting()->GetUsername());
+        }
+    }); };
+    Button* b = new Button(*UiElement::textureMap["HostMeeting"], openRoomFunc, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 3 }, {200*4.3, 200});
     b->SetOrigin(Center);
     MainScreen->AddElement(b);
-    b = new Button(*UiElement::textureMap["JoinMeeting"], func1, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 4.2 }, { 200 * 4.3, 200 });
+    b = new Button(*UiElement::textureMap["JoinMeeting"], 
+        [this]() mutable {screens["00main"]->SetActive(false); screens["01join"]->SetActive(true); Sleep(100); return; }, 
+        { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 4.2 }, { 200 * 4.3, 200 }
+    );
     b->SetOrigin(Center);
     MainScreen->AddElement(b);
-    b = new Button(*UiElement::textureMap["Settings"], func, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 5.4 }, { 200 * 4.3, 200 });
+    b = new Button(*UiElement::textureMap["Settings"],
+        [this]() mutable {return; screens["10settings"]->SetActive(true); Sleep(100);},
+        { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 5.4 }, { 200 * 4.3, 200 }
+    );
     b->SetOrigin(Center);
     MainScreen->AddElement(b);
     MainScreen->AddElement(mathLinkImg);
 
     // open room screen
-    TextBox* textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, {BASE_SCREEN_W / 2, BASE_SCREEN_H/4}, {800, 130}, "Enter Room Code", sf::Color::Black, 60);
-    textbox->SetOrigin(Center);
-    textbox->SetName("RoomCode");
-    Open->AddElement(textbox);
-    textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H/4*2 }, { 800, 130 }, "Enter Name", sf::Color::Black, 60);
-    textbox->SetOrigin(Center);
-    Open->AddElement(textbox);
-    auto confunc = [this]() {string ip = ((TextBox*)screens["01open"]->GetElementByName("RoomCode"))->GetText();
-                            cl.Connect(ip, 16016); };
-    b = new Button(*UiElement::textureMap["HostMeeting"], confunc, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 5 }, { 200 * 4.3, 200 });
-    b->SetOrigin(Center);
-    Open->AddElement(b);
-    Open->AddElement(new Button(*UiElement::textureMap["backButton"], [this](){screens["00main"]->SetActive(true); screens["01open"]->SetActive(false); }, { 150, 50 }, { 100, 100 }));
+    //TextBox* textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, {BASE_SCREEN_W / 2, BASE_SCREEN_H/4}, {800, 130}, "Enter Room Code", sf::Color::Black, 60);
+    //textbox->SetOrigin(Center);
+    //textbox->SetName("RoomCode");
+    //Open->AddElement(textbox);
+    //textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H/4*2 }, { 800, 130 }, "Enter Name", sf::Color::Black, 60);
+    //textbox->SetOrigin(Center);
+    //Open->AddElement(textbox);
+    //auto confunc = [this]() {string ip = ((TextBox*)screens["01open"]->GetElementByName("RoomCode"))->GetText();
+    //                        cl.Connect(ip, 16016); };
+    //b = new Button(*UiElement::textureMap["HostMeeting"], confunc, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 5 }, { 200 * 4.3, 200 });
+    //b->SetOrigin(Center);
+    //Open->AddElement(b);
+    //Open->AddElement(new Button(*UiElement::textureMap["backButton"], [this](){screens["00main"]->SetActive(true); screens["01open"]->SetActive(false); }, { 150, 50 }, { 100, 100 }));
 
 
     // join room screen
-    textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 }, { 800, 130 }, "Enter IP", sf::Color::Black, 60);
-    textbox->SetOrigin(Center);
-    textbox->SetName("ip");
-    Join->AddElement(textbox);
-    textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 * 2 }, { 800, 130 }, "Enter Room Code", sf::Color::Black, 60);
+    //TextBox* textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 }, { 800, 130 }, "Enter IP", sf::Color::Black, 60);
+    //textbox->SetOrigin(Center);
+    //textbox->SetName("ip");
+    //Join->AddElement(textbox);
+    TextBox* textbox = new TextBox(*UiElement::textureMap["TextBox"], UiElement::baseFont, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 4 * 1.5 }, { 800, 130 }, "Enter Room Code", sf::Color::Black, 60);
     textbox->SetOrigin(Center);
     textbox->SetName("RoomCode");
     Join->AddElement(textbox);
-    auto confunc1 = [this]() {string ip = ((TextBox*)screens["01join"]->GetElementByName("ip"))->GetText();
-    string roomCode = ((TextBox*)screens["01join"]->GetElementByName("RoomCode"))->GetText();
-    cl.Connect(ip, 16016, roomCode); };
+    auto confunc1 = [this]() {this->pythonContext.post([this]() {
+        string roomCode = ((TextBox*)screens["01join"]->GetElementByName("RoomCode"))->GetText();
+        auto get_join_server = fireBaseModule.attr("get_join_server");
+        std::string room_pref = roomCode.substr(0, 4);
+        pybind11::tuple tup = get_join_server(room_pref.c_str());
+        std::string ip = pybind11::cast<string>(*tup.begin());
+        int port = pybind11::cast<int>(*(tup.begin() + 1));
+        if (ip != "") {
+            meeting->AppendRoomCode(room_pref, true);
+            cl.Connect(ip, 16016, this->GetMeeting()->GetUsername(), roomCode.substr(4));
+        }
+        }); };
     b = new Button(*UiElement::textureMap["JoinMeeting"], confunc1, { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 5 }, { 200 * 4.3, 200 });
     b->SetOrigin(Center);
     Join->AddElement(b);

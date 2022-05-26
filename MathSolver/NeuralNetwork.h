@@ -1,38 +1,65 @@
 #pragma once
 #include <vector>
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include <fstream>
-using namespace std;
+#include <functional>
+#include "Layer.h"
 
-#define NumOfHiddenLayers 3
-#define NumOfNodesInHidden 40
-#define NumOfNodesInInput 2025
-#define NumOfNodesInOutput 14
-#define SetSize 10
-#define TimeTOGoOverTrain 10
-
-
-typedef double HiddenW[NumOfNodesInHidden][NumOfNodesInHidden];
+NetworkType* disCostDerivative(std::vector<NetworkType> output, int label);
 
 class NeuralNetwork
 {
 public:
-	NeuralNetwork();
-	NeuralNetwork(string fileName);
-	std::vector<double> Calc(double* input);
-	void SaveToFile(string fileName);
-	void BackProp(vector<double*> input, vector<int> label, double jumpSize);
-	void Learn(vector<double*>& input, vector<int>& label, double jumpSize);
-	void Test(vector<double*>& input, vector<int>& label);
+	/// <summary>
+	/// constructor
+	/// </summary>
+	/// <param name="layers"> vector of layers</param>
+	/// <param name="inputSize"> the size of input</param>
+	/// <param name="outputSize"> the size of output</param>
+	/// <param name="path"> the path to load layers from</param>
+	NeuralNetwork(std::vector<Layer*> layers, size_t inputSize, size_t outputSize, std::string path = "");
 
+	/// <summary>
+	/// the whole feed forward
+	/// </summary>
+	/// <param name="input"> input layer</param>
+	/// <returns> output layer</returns>
+	std::vector<NetworkType> FeedForword(NetworkType* input);
+
+	/// <summary>
+	/// the whole backprop process
+	/// </summary>
+	/// <param name="input"> input</param>
+	/// <param name="label"> true lable</param>
+	/// <param name="costDerivative"> the cost d function</param>
+	void Backpropagation(NetworkType* input, int label, std::function<NetworkType* (std::vector<NetworkType>, int)>& costDerivative);
+
+	/// <summary>
+	/// learn from training data
+	/// </summary>
+	/// <param name="input"> trainig inputs</param>
+	/// <param name="label"> training labels</param>
+	/// <param name="costDerivative"> cost derivative func</param>
+	/// <param name="epochs"> num of epochos </param>
+	/// <param name="learnRate"> learn rate</param>
+	/// <param name="setSize"> set size</param>
+	/// <param name="savePath"> save the result to...</param>
+	void Learn(std::vector<NetworkType*>& input, std::vector<int>& label, std::function<NetworkType* (std::vector<NetworkType>, int)> costDerivative, int epochs, double learnRate, int setSize, std::string savePath = "");
 private:
-	vector<double> layers[NumOfHiddenLayers + 2];
-	vector<double> bias[NumOfHiddenLayers + 1];
-	double inputW[NumOfNodesInHidden][NumOfNodesInInput];
-	double outputW[NumOfNodesInOutput][NumOfNodesInHidden];
-	HiddenW hiddenWs[NumOfHiddenLayers - 1];
 
+	/// <summary>
+	/// save 
+	/// </summary>
+	/// <param name="path"> the path to save</param>
+	void SaveNetwork(std::string path);
+
+	/// <summary>
+	/// layers
+	/// </summary>
+	std::vector<Layer*> layers;
+
+	/// <summary>
+	/// input and output
+	/// </summary>
+	NetworkType* input, * output;
+	size_t inputSize, outputSize;
 };
 

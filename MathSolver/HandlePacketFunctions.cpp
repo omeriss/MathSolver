@@ -5,6 +5,7 @@ void HandleDisconnectFromServer(uint32_t id, Packet* p)
 	std::cout << "disconnected" << std::endl;
 	UiManager::GetInstance()->cl.Disconnect();
 	UiManager::GetInstance()->GetMeeting()->SetActive(false);
+	UiManager::GetInstance()->GetScreens()["01join"]->SetActive(false);
 	UiManager::GetInstance()->GetScreens()["00main"]->SetActive(true);
 }
 
@@ -18,10 +19,11 @@ void HandlePingBack(uint32_t id, Packet* p)
 		std::cout << "Can't join room" << std::endl;
 		return;
 	}
-	std::cout << "Joined Room: " << roomCode << std::endl;
+	UiManager::GetInstance()->GetMeeting()->AppendRoomCode(roomCode, false);
 	UiManager::GetInstance()->GetMeeting()->SetActive(true);
 	UiManager::GetInstance()->GetMeeting()->SetSelfId(myId);
-	UiManager::GetInstance()->GetScreens()["01open"]->SetActive(false);
+	//UiManager::GetInstance()->GetScreens()["01open"]->SetActive(false);
+	UiManager::GetInstance()->GetScreens()["00main"]->SetActive(false);
 	UiManager::GetInstance()->GetScreens()["01join"]->SetActive(false);
 }
 
@@ -56,7 +58,9 @@ void HandleUserConnected(uint32_t id, Packet* p)
 	(*p) >> newid;
 	ParticipentType temp;
 	(*p) >> temp;
-	UiManager::GetInstance()->GetMeeting()->AddParticipant(newid, temp);
+	std::string userName;
+	(*p) >> userName;
+	UiManager::GetInstance()->GetMeeting()->AddParticipant(newid, temp, userName);
 	std::cout << "New user connected: " << newid <<std::endl;
 }
 

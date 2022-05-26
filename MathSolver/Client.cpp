@@ -5,10 +5,10 @@ Client::Client()
 	service.stop();
 }
 
-bool Client::Connect(std::string& ip, int16_t port, std::string roomCode)
+bool Client::Connect(std::string& ip, int16_t port, std::string userName, std::string roomCode)
 {
 	try {
-		std::cout << service.stopped() << std::endl;
+		// try to connect 
 		if (!service.stopped())
 			return false;
 		service.~io_context();
@@ -21,17 +21,21 @@ bool Client::Connect(std::string& ip, int16_t port, std::string roomCode)
 		asio::ip::basic_resolver<asio::ip::udp> rU(service);
 		auto endpointUdp = rU.resolve(ip, std::to_string(port));
 
+		// connect async
 		asio::async_connect(tcp->GetSocket() , endpoint,
-			[roomCode ,endpointUdp, this](std::error_code ec, asio::ip::tcp::endpoint endpoint)
+			[roomCode, userName ,endpointUdp, this](std::error_code ec, asio::ip::tcp::endpoint endpoint)
 			{
 				if (!ec)
 				{
+					// crate udp
 					std::cout << tcp->GetSocket().local_endpoint().port() << std::endl;
 					UDP::socket = new asio::ip::udp::socket(service, asio::ip::udp::endpoint(asio::ip::udp::v4(), tcp->GetSocket().local_endpoint().port()));
 					udp = new UDP(service, endpointUdp->endpoint());
 
+					// send room packet
 					std::shared_ptr<Packet> pingPacket = std::make_shared<Packet>();
 					(*pingPacket) << roomCode;
+					(*pingPacket) << userName;
 					pingPacket->GetHeader().packetType = RoomRequest;
 					tcp->Send(std::move(pingPacket));
 
@@ -73,6 +77,7 @@ void Client::SendTcp(std::shared_ptr<Packet> packet)
 
 void Client::Disconnect(bool destory)
 {
+	// clear and remove evryting that has to do with the connection
 	tcp->Disconnect();
 	UDP::socket->close();
 	if (destory) {

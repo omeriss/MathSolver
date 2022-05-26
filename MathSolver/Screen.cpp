@@ -2,6 +2,7 @@
 
 Screen::Screen(int w, int h, sf::RenderWindow* window, ScreenType screenType)
 {
+	// set size
 	view.setSize(w, h);
 	view.setCenter(w / 2, h / 2);
 	this->winodw = window;
@@ -21,6 +22,8 @@ Screen::Screen(int w, int h, sf::FloatRect port, sf::RenderWindow* window, Scree
 
 void Screen::ReScale(int width, int height, int lastWidth, int lastHeight)
 {
+	// rescale by alignment
+
 	float scale = (screenType == ScaleByWith)? view.getSize().x * 1.0 / width / view.getViewport().width * view.getViewport().height :view.getSize().y * 1.0 / height / view.getViewport().height * view.getViewport().width;
 	//float scale = (screenType == ScaleByWith) ? lastWidth * 1.0/view.getSize().x/ width : lastHeight * 1.0 / height;
 	sf::FloatRect portCords;
@@ -114,6 +117,11 @@ void Screen::SwapUiElements(std::vector<UiElement*>& elements)
 sf::FloatRect Screen::GetPort()
 {
 	return view.getViewport();
+}
+
+void Screen::SetPort(sf::FloatRect port)
+{
+	view.setViewport(port);
 }
 
 UiElement* Screen::GetElementByName(std::string name)

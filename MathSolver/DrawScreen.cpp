@@ -4,11 +4,13 @@ DrawScreen::DrawScreen(sf::Vector2f pos, sf::Vector2f size, Screen* subScreen)
 {
 	canDraw = false;
 
-	overlay.create(BASE_DRAW_SCREEN_W, BASE_DRAW_SCREEN_H);
+	// create overlay
+	overlay.create(BASE_DRAW_SCREEN_W, BASE_DRAW_SCREEN_H * Draw_Screen_H_Mul);
 	overlay.clear(sf::Color(0, 0, 0, 0));
 
 	board.create(BASE_DRAW_SCREEN_W, BASE_DRAW_SCREEN_H * Draw_Screen_H_Mul);
 
+	// create view
 	View.setSize(BASE_DRAW_SCREEN_W, BASE_DRAW_SCREEN_H * Draw_Screen_H_Mul);
 	View.setCenter(BASE_DRAW_SCREEN_W/2, BASE_DRAW_SCREEN_H * Draw_Screen_H_Mul /2);
 	board.setView(View);
@@ -26,6 +28,7 @@ DrawScreen::DrawScreen(sf::Vector2f pos, sf::Vector2f size, Screen* subScreen)
 	drawRadius = 1;
 
 	drawingRect = false;
+	// init the pixels
 	boardPixels.resize(BASE_DRAW_SCREEN_H * Draw_Screen_H_Mul);
 	Clear();
 	this->clinet == nullptr;
@@ -33,6 +36,7 @@ DrawScreen::DrawScreen(sf::Vector2f pos, sf::Vector2f size, Screen* subScreen)
 
 void DrawScreen::Update(sf::RenderWindow& window)
 {
+	// see if the mouse is pressing the board
 	auto mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && this->InsideSprite(mousePos)) {
 		if (!drawingRect) {
@@ -40,6 +44,7 @@ void DrawScreen::Update(sf::RenderWindow& window)
 			rectStart = mousePos;
 		}
 		else {
+			// draw the mark rect
 			overlay.clear(sf::Color(0, 0, 0, 0));
 			OverlaySprite.setPosition({ 0,0 });
 			sf::RectangleShape markedRect = sf::RectangleShape({ std::abs(mousePos.x - rectStart.x), std::abs(mousePos.y - rectStart.y) });
@@ -51,6 +56,8 @@ void DrawScreen::Update(sf::RenderWindow& window)
 		}
 	}
 	else if (!sf::Mouse::isButtonPressed(sf::Mouse::Right) && drawingRect && this->InsideSprite(mousePos)) {
+
+		// find the chars in the marked spot and solve the equation
 		drawingRect = false;
 
 		overlay.clear(sf::Color(0, 0, 0, 0));
@@ -59,19 +66,21 @@ void DrawScreen::Update(sf::RenderWindow& window)
 
 		this->equationAnalizer.LoadFromImages(results);
 
-		for (auto const& rect : results) {
-			sf::RectangleShape tempRect(sf::Vector2f(rect.first.width, rect.first.height));
-			tempRect.setPosition(rect.first.left, rect.first.top + sprite.getPosition().y);
-			tempRect.setFillColor(sf::Color(0, 0, 0, 0));
-			tempRect.setOutlineColor(sf::Color::Red);
-			tempRect.setOutlineThickness(3);
-			overlay.draw(tempRect);
-		}
+		// draw red box for chars
+		//for (auto const& rect : results) {
+		//	sf::RectangleShape tempRect(sf::Vector2f(rect.first.width, rect.first.height));
+		//	tempRect.setPosition(rect.first.left, rect.first.top + sprite.getPosition().y);
+		//	tempRect.setFillColor(sf::Color(0, 0, 0, 0));
+		//	tempRect.setOutlineColor(sf::Color::Red);
+		//	tempRect.setOutlineThickness(3);
+		//	overlay.draw(tempRect);
+		//}
 
 		overlay.display();
 		OverlaySprite.setTexture(overlay.getTexture());
 	}
 
+	// scroll
 	if (UiElement::MouseWheelDelta && InsideSprite(mousePos)) {
 		float spriteY = sprite.getPosition().y + UiElement::MouseWheelDelta * MouseWheelSensitivity;
 		spriteY = (spriteY < 0) ? spriteY : 0;
@@ -86,6 +95,7 @@ void DrawScreen::Update(sf::RenderWindow& window)
 
 void DrawScreen::DrawAround(int x, int y)
 {
+	// draw with the pixel around x, y
 	if (drawRadius == 0) {
 		DrawAndSend(x, y);
 		return;
@@ -111,6 +121,8 @@ void DrawScreen::DrawAround(int x, int y)
 void DrawScreen::DrawAndSend(int x, int y)
 {
 	if (y < BASE_DRAW_SCREEN_H * Draw_Screen_H_Mul && x < BASE_DRAW_SCREEN_W && x >= 0 && y >= 0) {
+
+		// send only of color changed
 		if (boardPixels[y][x].toInteger() == pixel.getFillColor().toInteger())
 			return;
 		pixel.setPosition(x, y);
@@ -131,6 +143,8 @@ void DrawScreen::DrawLine(sf::Vector2f pos)
 	float len = 0;
 	float rayLenSqure = dir.x * dir.x + dir.y * dir.y;
 	dir /= (sqrt(rayLenSqure));
+
+	// calc the step
 	sf::Vector2f UnitLen = {sqrt(pow((dir.y/dir.x), 2.0f) + 1), sqrt(pow((dir.x / dir.y), 2.0f) + 1)};
 	sf::Vector2f ray = { ((dir.x < 0) ? lastPos.x - floor(lastPos.x) : floor(lastPos.x + 1) - lastPos.x) * UnitLen.x,
 	((dir.y < 0) ? lastPos.y - floor(lastPos.y) : floor(lastPos.y + 1) - lastPos.y)* UnitLen.y };
@@ -163,6 +177,7 @@ void DrawScreen::DrawLine(sf::Vector2f pos)
 
 void DrawScreen::SetCell(int x, int y, sf::Color color)
 {
+	// set a cell to a new color
 	boardPixels[y][x] = color;
 	sf::Color temp = pixel.getFillColor();
 	pixel.setFillColor(color);
@@ -175,10 +190,12 @@ void DrawScreen::SetCell(int x, int y, sf::Color color)
 
 void DrawScreen::SetLine(int y, array<sf::Color, BASE_DRAW_SCREEN_W>& pixels)
 {
+	// set line to new colors
 	boardPixels[y] = pixels;
 	sf::Color temp = pixel.getFillColor();
 
 	int x = 0;
+	// print the line and set the arr
 	for (auto c : pixels) {
 		if (c != sf::Color::White) {
 			this->boardPixels[y][x] = c;
@@ -245,6 +262,7 @@ std::pair<sf::IntRect, double*> DrawScreen::findChar(int startX, int startY, sf:
 	std::stack<sf::Vector2i> positions;
 	nextFilledPositions.push({ startX, startY});
 
+	// do dfs over all the chaged color pixels
 	while (!nextFilledPositions.empty()) {
 		int x = nextFilledPositions.top().x;
 		int y = nextFilledPositions.top().y;
@@ -255,6 +273,8 @@ std::pair<sf::IntRect, double*> DrawScreen::findChar(int startX, int startY, sf:
 			continue;
 		positions.push({ x, y });
 		done[(y - area.top) * area.width + (x - area.left)] = true;
+
+		// get the new rect
 		minX = std::min(minX, x);
 		maxX = std::max(maxX, x);
 		minY = std::min(minY, y);
@@ -264,9 +284,12 @@ std::pair<sf::IntRect, double*> DrawScreen::findChar(int startX, int startY, sf:
 		}
 	}
 
+	// create the image
 	double* image = new double[CharImageH * CharImageW];
 	std::memset(image, 0, CharImageH * CharImageW * sizeof(double));
 
+
+	// rescale
 	float OgImgW = (maxX - minX + 1), OgImgH = (maxY - minY + 1);
 	float ImageScaleX = 1.0 * CharImageW / OgImgW, ImageScaleY = 1.0 * CharImageH / OgImgH, ImgScale;
 	int XInc = 0, YInc = 0;
@@ -279,6 +302,8 @@ std::pair<sf::IntRect, double*> DrawScreen::findChar(int startX, int startY, sf:
 		ImgScale = ImageScaleY;
 		XInc = (OgImgH - OgImgW) * ImgScale / 2;
 	}
+
+	// upscale
 	if (ImgScale > 1) {
 		std::cout << "The Char Is too Small" << std::endl;
 		bool* tempImage = new bool[long long(OgImgW) * long long(OgImgH)];
@@ -292,29 +317,30 @@ std::pair<sf::IntRect, double*> DrawScreen::findChar(int startX, int startY, sf:
 		for (int y = YInc; y < CharImageH - YInc; y++) {
 			for (int x = XInc; x < CharImageW - XInc; x++) {
 				if((int((x - XInc) / ImgScale)) * (int(OgImgH)) + int((y - YInc) / ImgScale) < OgImgW* OgImgH)
-					image[(x) *CharImageH+y] = tempImage[(int((x-XInc)/ ImgScale))*(int(OgImgH)) + int((y-YInc) / ImgScale)];
+					image[(y) * CharImageW + x] = tempImage[(int((x-XInc)/ ImgScale))*(int(OgImgH)) + int((y-YInc) / ImgScale)];
 			}
 		}
 		delete[] tempImage;
 	}
 	else {
+		// downscale
 		while (!positions.empty()) {
 			int x = positions.top().x - minX;
 			int y = positions.top().y - minY;
 			positions.pop();
 			x = x * ImgScale + XInc;
 			y = y * ImgScale + YInc;
-			image[x * (CharImageH)+y] = 1;
+			image[y * (CharImageW) + x] = 1;
 		}
 	}
 
-	
+	// save the images if wanted
 	if (FolderToSaveImgs != "") {
 		sf::Image tempImg;
 		tempImg.create(CharImageH, CharImageW);
 		for (int x = 0; x < CharImageW; x++) {
 			for (int y = 0; y < CharImageH; y++) {
-				tempImg.setPixel(x, y, sf::Color(image[x * (CharImageH)+y]*255, image[x * (CharImageH)+y]*255, image[x * (CharImageH)+y]*255));
+				tempImg.setPixel(x, y, sf::Color(image[y * (CharImageW)+x]*255, image[y * (CharImageW)+x]*255, image[y * (CharImageW)+x]*255));
 			}
 		}
 		std::string imgPath = FolderToSaveImgs;
@@ -330,6 +356,8 @@ vector<std::pair<sf::IntRect, double*>> DrawScreen::FindChars(sf::IntRect area)
 	vector<std::pair<sf::IntRect, double*>> results;
 	bool* done = new bool[area.width*area.height];
 	std::memset(done, false, area.width*area.height * sizeof(bool));
+
+	// find all the chars is the marked area
 	for (int y = area.top; y < area.top + area.height; y++) {
 		for (int x = area.left; x < area.left + area.width; x++) {
 			if (!done[(y - area.top) * area.width + (x - area.left)] && this->boardPixels[y][x].toInteger() != BaseDrawScreenColor.toInteger()) {
@@ -363,5 +391,6 @@ void DrawScreen::Draw(sf::RenderWindow& window) {
 void DrawScreen::Print(sf::RenderWindow& window)
 {
 	window.draw(sprite);
-	window.draw(OverlaySprite);
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+		window.draw(OverlaySprite);
 }

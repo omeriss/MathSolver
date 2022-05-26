@@ -1,76 +1,79 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Button">
-    <Position X="12.25" Y="6.25" Width="1.5" />
+    <Position X="39.5" Y="12.5" Width="1.5" />
+    <InheritanceLine Type="UiElement" FixedToPoint="true">
+      <Path>
+        <Point X="31.25" Y="6.074" />
+        <Point X="31.25" Y="6.5" />
+        <Point X="41.375" Y="6.5" />
+        <Point X="41.375" Y="12.5" />
+        <Point X="41" Y="12.5" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>AEQAAAAAAAAAAIgIAEAAAAAAAAAAAgAIAAAAAAAEAAA=</HashCode>
       <FileName>Button.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="UiElement">
-    <Position X="8" Y="0.5" Width="1.5" />
+    <Position X="30.5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAQAAAAIACAAAAAJEAAAAEAEABAEAhAEAAACUAAEBAA=</HashCode>
+      <HashCode>AAQAAAAIACAAAAAJEAAAAEAEABAEAhAEAAACUIAEBAA=</HashCode>
       <FileName>UiElement.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Screen">
-    <Position X="0.5" Y="3.25" Width="1.5" />
+    <Position X="26" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AMAAAAAEAAAhCBAAFAAAABAAAABCAAACAQACAIAAAAA=</HashCode>
       <FileName>Screen.h</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="screenType" />
-    </ShowAsAssociation>
   </Class>
   <Class Name="DragBar">
-    <Position X="3.25" Y="3" Width="1.5" />
+    <Position X="29.5" Y="12.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>CAQAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAEABAAAEAAA=</HashCode>
       <FileName>DragBar.h</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="screen" />
-    </ShowAsAssociation>
   </Class>
   <Class Name="Graph">
-    <Position X="13.5" Y="0.5" Width="1.5" />
+    <Position X="37" Y="12.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>iAQwAgAAAAAAAAAAAAAIAAAJgAAAAAgACEAgAAAEAAA=</HashCode>
+      <HashCode>iAQwAgAAAACAAAAAAAAIAAAJgAAAAAgACEAgAAAEAAA=</HashCode>
       <FileName>Graph.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Image">
-    <Position X="3.75" Y="0.5" Width="1.5" />
+    <Position X="24.5" Y="12.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAACAAAEAAA=</HashCode>
       <FileName>Image.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ScrollBar">
-    <Position X="6" Y="7" Width="1.5" />
+    <Position X="22.5" Y="12.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQBAAgAAAABAAAIAAAAAAAAAAAAQAAAAAABAAAEAAA=</HashCode>
       <FileName>ScrollBar.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="TextBox">
-    <Position X="7.75" Y="6.5" Width="1.5" />
+    <Position X="44" Y="12.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAACAAIAEAAIAFAgAAAAAAABAgAIAAAAAADEAAA=</HashCode>
       <FileName>TextBox.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ToggleButton">
-    <Position X="9.5" Y="6.25" Width="1.5" />
+    <Position X="26.75" Y="12.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAwAIAAAAAAAFIgAAAAAAAAAAAAAAgAEAAACAAAEAAA=</HashCode>
       <FileName>ToggleButton.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Participant">
-    <Position X="15.5" Y="8.75" Width="1.5" />
+    <Position X="14.75" Y="5.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAiQEAAAACAAEMAAAAAABIABAAAAAAAACCACAAFAIAA=</HashCode>
       <FileName>Meeting.h</FileName>
@@ -80,7 +83,7 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="VoiceChatSoundRecorder">
-    <Position X="13.5" Y="12.5" Width="1.5" />
+    <Position X="13.5" Y="13.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAQAABAAAAAQAAAAAAAAEQAAAAA=</HashCode>
       <FileName>Meeting.h</FileName>
@@ -91,53 +94,21 @@
   </Class>
   <Class Name="Meeting">
     <Position X="0.5" Y="8.5" Width="1.5" />
-    <AssociationLine Name="boardScreen" Type="Screen">
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-0.475" Y="0.281" />
-      </MemberNameLabel>
-    </AssociationLine>
-    <AssociationLine Name="participentsScreen" Type="Screen">
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-0.623" Y="0.525" />
-      </MemberNameLabel>
-    </AssociationLine>
-    <AssociationLine Name="toolsScreen" Type="Screen">
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-0.487" Y="0.681" />
-      </MemberNameLabel>
-    </AssociationLine>
     <TypeIdentifier>
       <HashCode>AAAcGAABACoAAAAAAAAAABABAIAAIAAAIAgIJYCAECA=</HashCode>
       <FileName>Meeting.h</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Field Name="boardScreen" />
-      <Field Name="participentsScreen" />
-      <Field Name="toolsScreen" />
       <Field Name="client" />
       <Field Name="voiceRecorder" />
-      <Field Name="board" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="NeuralNetwork">
-    <Position X="10.25" Y="10.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>QAAAAgAgAAAAAAEAAQAAAAQAAAAAABAAAAIAjAAAAAA=</HashCode>
-      <FileName>NeuralNetwork.h</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="UiManager">
-    <Position X="5.5" Y="1.25" Width="1.5" />
-    <AssociationLine Name="meeting" Type="Meeting" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="5.5" Y="4.321" />
-        <Point X="5.125" Y="4.321" />
-        <Point X="5.125" Y="5.75" />
-        <Point X="3.25" Y="5.75" />
-        <Point X="3.25" Y="8.826" />
-        <Point X="2" Y="8.826" />
-      </Path>
-    </AssociationLine>
+    <Position X="8" Y="0.5" Width="1.5" />
+    <Members>
+      <Field Name="cl" Hidden="true" />
+      <Field Name="meeting" Hidden="true" />
+    </Members>
     <TypeIdentifier>
       <HashCode>AAQAIAAAECAgAAABAAEEAAAABAJggACIAAAiAAEgQAE=</HashCode>
       <FileName>UiManager.h</FileName>
@@ -158,44 +129,18 @@
       <Field Name="udp" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="EquationAnalizer">
-    <Position X="8" Y="11.25" Width="1.5" />
-    <AssociationLine Name="network" Type="NeuralNetwork">
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="0.037" Y="0.069" />
-      </MemberNameLabel>
-    </AssociationLine>
-    <TypeIdentifier>
-      <HashCode>AAIAAAQAABAQAAAAAAAAAIBhAAAAAAAABAEAAAAABAA=</HashCode>
-      <FileName>EquationAnalizer.h</FileName>
-    </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="network" />
-    </ShowAsAssociation>
-  </Class>
   <Class Name="DrawScreen">
-    <Position X="3.5" Y="6" Width="1.5" />
+    <Position X="33.5" Y="12.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AIQEIAgAgIEAAgEAAIAAABAAAAABAkAAKEoAEhDEFAE=</HashCode>
       <FileName>DrawScreen.h</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="clinet" />
-      <Field Name="equationAnalizer" />
-    </ShowAsAssociation>
   </Class>
   <Class Name="TCP">
     <Position X="1" Y="19" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAEAIAAAAAAAEAAAAAAAAAAAEAAAEAIAA=</HashCode>
       <FileName>TCP.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="TSUM&lt;KeyType, ValType&gt;">
-    <Position X="6.25" Y="18.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAEAAAEAAABABAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>UDP.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="UDP">
@@ -216,7 +161,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="PacketExecutor">
-    <Position X="12" Y="16.25" Width="1.5" />
+    <Position X="11.75" Y="16" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAIAQAAAAAAAAAAAAAAAACABAFAAAAAAEAgBgAAIAA=</HashCode>
       <FileName>PacketExecutor.h</FileName>
@@ -231,6 +176,92 @@
     <ShowAsAssociation>
       <Field Name="header" />
     </ShowAsAssociation>
+  </Class>
+  <Class Name="ActivationFunction">
+    <Position X="16.75" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAgAgAIABAAGAAAAAAAIAAAAAgAAAAAAAAAAAAAE=</HashCode>
+      <FileName>ActivationFunction.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sigmoid">
+    <Position X="16.75" Y="16.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAAAAAAAAIAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>ActivationFunction.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ConvolutionalLayer">
+    <Position X="16.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AARIJgAgAIAIIAEAAAAAAAQAAAACkAAAAAIUAAAQAIE=</HashCode>
+      <FileName>ConvolutionalLayer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FullyConnectedLayer">
+    <Position X="19" Y="12" Width="1.5" />
+    <AssociationLine Name="weights" Type="Matrix&lt;T&gt;">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.046" Y="0.279" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="biasesGradient" Type="Vector&lt;T&gt;">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.565" Y="0.652" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="weightsGradient" Type="Matrix&lt;T&gt;">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.073" Y="0.472" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAgAgAIEAAAEEAAAAAAAAgQAAwAAAAAIAACAAAIE=</HashCode>
+      <FileName>FullyConnectedLayer.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="weights" />
+      <Field Name="biasesGradient" />
+      <Field Name="weightsGradient" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Layer">
+    <Position X="12.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIgwgAIAAAAEAAAAAAAAACAAAgBAEAAAAAAAQAAE=</HashCode>
+      <FileName>Layer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NeuralNetwork">
+    <Position X="10.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIEAAAEAAAAAAAQAiAAAABAAAAAApAAAAAA=</HashCode>
+      <FileName>NeuralNetwork.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EquationAnalizer">
+    <Position X="7.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAQAABAQAAAAAAAAAIBhAAAAAAAABAEAAAAABAA=</HashCode>
+      <FileName>EquationAnalizer.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="network" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Matrix&lt;T&gt;">
+    <Position X="19" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAGoABAACChACAgAAAAQAAAAEgAAAQGggAAAAAAAA=</HashCode>
+      <FileName>Matrix.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Vector&lt;T&gt;">
+    <Position X="16.75" Y="19.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>Matrix.h</FileName>
+    </TypeIdentifier>
   </Class>
   <Struct Name="CalcElement">
     <Position X="15.75" Y="2.75" Width="1.5" />

@@ -15,16 +15,24 @@ enum class ParticipentType :uint16_t {
 
 class Participant {
 public:
-    Participant(uint32_t uid, int pos, Screen* participentsScreen, Client* cl){
+
+    /// <summary>
+    /// constructor
+    /// </summary>
+    /// <param name="uid"> user id</param>
+    /// <param name="pos"> pos in queue</param>
+    /// <param name="participentsScreen"> p screen</param>
+    /// <param name="cl"> client instance</param>
+    Participant(uint32_t uid, std::string userName, int pos, Screen* participentsScreen, Client* cl){
         this->uid = uid;
         this->pos = pos;
 
         UserRec = new Image(*UiElement::textureMap["UserRec"], {Start_Offset_x, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y}, { User_Lable_Size_x, User_Lable_Size_y});
         participentsScreen->AddElement(UserRec);
 
-        userName = new TextBox(*UiElement::textureMap["Empty"], UiElement::baseFont, { Start_Offset_x + User_Name_Offset_X, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y + UserName_Offset_From_Button_Top},
-            { User_Lable_Size_x, User_Lable_Size_y - User_Name_Offset_X }, (uid == 1)?"omeriss":"tom", sf::Color::Black, User_Name_Font_Size, NoEdit);
-        participentsScreen->AddElement(userName);
+        userNameTextBox = new TextBox(*UiElement::textureMap["Empty"], UiElement::baseFont, { Start_Offset_x + User_Name_Offset_X, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y + UserName_Offset_From_Button_Top},
+            { User_Lable_Size_x, User_Lable_Size_y - User_Name_Offset_X }, userName, sf::Color::Black, User_Name_Font_Size, NoEdit);
+        participentsScreen->AddElement(userNameTextBox);
 
         canDraw = new ToggleButton(*UiElement::textureMap["notEditorButton"], *UiElement::textureMap["editorButton"],
             [cl, this](bool b) {
@@ -42,25 +50,38 @@ public:
         this->sampleCount = 0;
 
     }
-
+    
+    /// <summary>
+    /// remove from p screen
+    /// </summary>
+    /// <param name="participentsScreen">p screen </param>
     void RemoveFromScreen(Screen* participentsScreen) {
         participentsScreen->RemoveElement(UserRec);
         delete UserRec;
-        participentsScreen->RemoveElement(userName);
-        delete userName;
+        participentsScreen->RemoveElement(userNameTextBox);
+        delete userNameTextBox;
         participentsScreen->RemoveElement(canDraw);
         delete canDraw;
     }
 
+    /// <summary>
+    /// set new pos because one was removed
+    /// </summary>
+    /// <param name="RemovedPos"> the removed pos</param>
     void CorrectPosition(int RemovedPos) {
         if (pos < RemovedPos)
             return;
         pos--;
         UserRec->SetPosition({ Start_Offset_x, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y });
-        userName->SetPosition({ Start_Offset_x + User_Name_Offset_X, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y + UserName_Offset_From_Button_Top });
+        userNameTextBox->SetPosition({ Start_Offset_x + User_Name_Offset_X, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y + UserName_Offset_From_Button_Top });
         canDraw->SetPosition({ Start_Offset_x + Draw_Button_Offset_X, Start_Offset_y + pos * Skip_Size_Factor * User_Lable_Size_y + Draw_Button_Offset_From_Button_Top });
     }
-
+    
+    /// <summary>
+    /// load sound data
+    /// </summary>
+    /// <param name="soundData">data</param>
+    /// <param name="dataSize">size</param>
     void LoadSoundData(Byte* soundData, int dataSize) {
         if (sampleCount < BufferPlay) {
             std::memcpy(userSamplesBuffer + sampleCount, (const sf::Int16*)soundData, dataSize);
@@ -80,6 +101,10 @@ public:
         return pos;
     }
 
+    /// <summary>
+    /// set the p type
+    /// </summary>
+    /// <param name="participentType">new ptype</param>
     void SetParticipentType(ParticipentType participentType) {
         this->participentType = participentType;
         if(participentType == ParticipentType::WatchOnly)
@@ -97,7 +122,7 @@ private:
     int pos;
     Image* UserRec;
     ToggleButton* canDraw;
-    TextBox* userName;
+    TextBox* userNameTextBox;
     sf::Sound userSound;
     sf::SoundBuffer userSoundBuffer;
     sf::Int16 userSamplesBuffer[SoundBufferSize];
@@ -121,6 +146,13 @@ private:
         this->setProcessingInterval(sf::Time(sf::seconds(Recorder_Processing_Interval)));
         return true;
     }
+
+    /// <summary>
+    /// pcocess sound
+    /// </summary>
+    /// <param name="samples"></param>
+    /// <param name="sampleCount"></param>
+    /// <returns></returns>
     virtual bool onProcessSamples(const sf::Int16* samples, std::size_t sampleCount)
     {
         tr = new std::thread([samples, sampleCount, this]() {
@@ -139,27 +171,63 @@ private:
 class Meeting
 {
 public:
+    /// <summary>
+    /// constructor
+    /// </summary>
+    /// <param name="boardS">board screen</param>
+    /// <param name="paricipentsS">participents screen </param>
+    /// <param name="toolsS">tools screen</param>
+    /// <param name="subScreen">sub s</param>
+    /// <param name="cl">cleint</param>
     Meeting(Screen* boardS, Screen* paricipentsS, Screen* toolsS, Screen* subScreen, Client* cl);
     void SetActive(bool state);
     void SetCell(int x, int y, sf::Color color);
     void SetLine(int y, array<sf::Color, BASE_DRAW_SCREEN_W>& pixels);
-    void AddParticipant(uint32_t uid, ParticipentType pType);
+    /// <summary>
+    /// add new participent
+    /// </summary>
+    /// <param name="uid"> uid</param>
+    /// <param name="pType"> the ptype</param>
+    void AddParticipant(uint32_t uid, ParticipentType pType, std::string userName);
     void RemoveParticipant(uint32_t uid);
+    /// <summary>
+    /// play audio of client of voice chat 
+    /// </summary>
+    /// <param name="uid"> the uid of the client</param>
+    /// <param name="soundData">data</param>
+    /// <param name="dataSize">size</param>
     void PlayAudioData(uint32_t uid, Byte* soundData, int dataSize);
     void SetColor(sf::Color color);
     void SetSelfId(uint32_t selfId);
     void SetRadius(float r);
     void SetParticipentType(uint32_t uid, ParticipentType participentType);
     void ChangeRecorderState(bool active);
+    void AppendRoomCode(std::string code, bool restart);
+    std::string& GetUsername();
+
 private:
     bool isActive;
+
+    /// <summary>
+    /// screens
+    /// </summary>
     Screen *boardScreen, *participentsScreen, *toolsScreen;
     ParticipentType participentType;
     DrawScreen* board;
+
+    /// <summary>
+    /// client instance
+    /// </summary>
     Client* client;
     int participantsCount;
+
+    /// <summary>
+    /// participents map
+    /// </summary>
     std::map<uint32_t, Participant*> participants;
     VoiceChatSoundRecorder voiceRecorder;
     uint32_t selfId;
+    std::string roomCode;
+    std::string userName;
 };
 

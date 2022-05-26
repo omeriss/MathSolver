@@ -50,11 +50,11 @@
 
 #define CharImageH 45
 #define CharImageW 45
-#define NumOfHiddenLayers 3
-#define NumOfNodesInHidden 40
-#define NumOfNodesInInput (CharImageH*CharImageW)
-#define NumOfNodesInOutput 10
 #define SetSize 10
-#define LEARNRATE 2
-#define NNSaveFile "with14.dat"
-#define NNUploadFile "with14.dat"
+#define LEARNRATE 0.1
+#define NNUploadFile "cnn.dat"
+
+// Solve equations
+#define NEWTON_MIN_VALID 0.00000001
+#define NEWTON_ITERATIONS 100
+#define NEWTON_TRYS 5

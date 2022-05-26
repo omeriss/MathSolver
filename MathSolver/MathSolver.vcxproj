@@ -150,10 +150,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ActivationFunction.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Client.cpp" />
+    <ClCompile Include="ConvolutionalLayer.cpp" />
     <ClCompile Include="DrawScreen.cpp" />
     <ClCompile Include="EquationAnalizer.cpp" />
+    <ClCompile Include="FullyConnectedLayer.cpp" />
+    <ClCompile Include="Layer.cpp" />
     <ClCompile Include="NetworkProtocol.cpp" />
     <ClCompile Include="NeuralNetwork.cpp" />
     <ClCompile Include="ScrollBar.cpp" />
@@ -174,10 +178,15 @@
     <ClCompile Include="UiManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActivationFunction.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Client.h" />
+    <ClInclude Include="ConvolutionalLayer.h" />
     <ClInclude Include="DrawScreen.h" />
     <ClInclude Include="EquationAnalizer.h" />
+    <ClInclude Include="FullyConnectedLayer.h" />
+    <ClInclude Include="Layer.h" />
+    <ClInclude Include="Matrix.h" />
     <ClInclude Include="NetworkProtocol.h" />
     <ClInclude Include="NeuralNetwork.h" />
     <ClInclude Include="ScrollBar.h" />
