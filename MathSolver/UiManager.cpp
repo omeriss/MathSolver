@@ -237,7 +237,7 @@ void UiManager::InitScreens()
     b->SetOrigin(Center);
     MainScreen->AddElement(b);
     b = new Button(*UiElement::textureMap["Settings"],
-        [this]() mutable {return; screens["10settings"]->SetActive(true); Sleep(100);},
+        [this]() mutable {screens["10settings"]->SetActive(true); Sleep(100);},
         { BASE_SCREEN_W / 2, BASE_SCREEN_H / 6 * 5.4 }, { 200 * 4.3, 200 }
     );
     b->SetOrigin(Center);
@@ -293,6 +293,9 @@ void UiManager::InitScreens()
     Draw->AddElement(dsc);
 
     // tools screen
+    TextBox* roomCodeTextBox = new TextBox(*UiElement::textureMap["Empty"], UiElement::baseFont, { 850, 30 }, { 200, 500 }, "room code:\n----------------", sf::Color::Red, 16, NoEdit);;
+    roomCodeTextBox->SetName("RoomCodeText");
+    tools->AddElement(roomCodeTextBox);
     tools->AddElement(new Button(*UiElement::textureMap["blackButton"], 
         [changecolor = sf::Color(0, 0, 0), this](){ this->GetMeeting()->SetColor(changecolor);
         ((Image*)(screens["03Tools"]->GetElementByName("ImageColor")))->ChangeTexture(*UiElement::textureMap["blackButton"]); },
@@ -344,7 +347,7 @@ void UiManager::InitScreens()
         { 10, 10 }, { 50,50 }));
 
     auto muteToggle = new ToggleButton(*UiElement::textureMap["NotMuted"], *UiElement::textureMap["Muted"], [this](bool state) {this->GetMeeting()->ChangeRecorderState(!state); },
-        { 800, 35 }, { 50, 50 });
+        { 780, 35 }, { 50, 50 });
     muteToggle->SetName("MuteButton");
     tools->AddElement(muteToggle);
 
@@ -354,6 +357,54 @@ void UiManager::InitScreens()
 
     // create meeting class
     meeting = new Meeting(Draw, participents, tools, subScreenEq, &cl);
+
+
+    // settings screen
+    auto settingBack = new Image(*UiElement::textureMap["settingsRec"], { BASE_SCREEN_W / 2.0, BASE_SCREEN_H / 2.0 }, { BASE_SCREEN_W * 0.75, BASE_SCREEN_H * 0.75 });
+    settingBack->SetOrigin(Center);
+    settingsScreen->AddElement(settingBack);
+    auto selectedDot = new Image(*UiElement::textureMap["greenDot"], { SETTING_DOT_START_X, 0 }, { 30,30 });
+    selectedDot->SetOrigin(Center);
+    settingsScreen->AddElement(selectedDot);
+    settingsScreen->AddElement(new Button(*UiElement::textureMap["backButton"], [this]() {screens["10settings"]->SetActive(false); }, { 340, 220 }, { 100, 100 }));
+    settingsScreen->AddElement(new TextBox(*UiElement::textureMap["Empty"], UiElement::baseFont, { 700, 300 }, {100, 500 }, "Choose your mic", sf::Color::Red, 50, NoEdit));
+
+    auto refMics = [this, settingsScreen, selectedDot]() {
+        static vector<Button*> micButtons = {};
+        for (auto b : micButtons) {
+            settingsScreen->RemoveElement(b);
+        }
+        auto mics = sf::SoundRecorder::getAvailableDevices();
+        float yPos = SETTINGS_TEXT_START_Y;
+        for (auto micS : mics) {
+            auto lastBrac = micS.begin();
+            while (std::find(lastBrac + 1, micS.end(), ')') != micS.end())
+                lastBrac = std::find(lastBrac + 1, micS.end(), ')');
+            std::string cleanS = std::string((std::find(micS.begin(), micS.end(), '(') == micS.end()) ? micS.begin(): std::find(micS.begin(), micS.end(), '(') + 1, lastBrac);
+            Button* b = new Button(*UiElement::textureMap["Empty"],
+                [this, selectedDot, micS, yPos]() mutable {
+                    meeting->GetRecorder().setDevice(micS);
+                    selectedDot->SetPosition({ selectedDot->GetPosition().x, yPos + SETTING_DOT_OFFSET_Y });
+                },
+                { SETTINGS_TEXT_START_X, yPos}, { SETTING_BUTTON_W, SETTINGS_TEXT_JUMP_Y }
+            );
+
+            b->SetString(cleanS, UiElement::baseFont);
+            settingsScreen->AddElement(b);
+            micButtons.push_back(b);
+
+            if (micS == meeting->GetRecorder().getDevice())
+                selectedDot->SetPosition({ selectedDot->GetPosition().x, yPos + SETTING_DOT_OFFSET_Y });
+
+            yPos += SETTINGS_TEXT_JUMP_Y;
+        }
+    };
+    refMics();
+
+    settingsScreen->AddElement(
+        new Button(*UiElement::textureMap["redReload"],
+        refMics, { 1100, 300 }, { 60, 60 }
+    ));
 }
 
 void UiManager::Start()
@@ -394,8 +445,13 @@ void UiManager::Start()
 
 void UiManager::Update()
 {
+    // udate the window defult evetns
     UpdateSfmlEvents();
+
+    // execute all the packets from the server
     PacketExecutor::GetInstance()->Udate();
+
+    // find the screen on top
     window->clear(Backround_Color);
     std::map<std::string, Screen*>::iterator screenOnTop = screens.end();
     auto click = sf::Mouse::getPosition(*this->window);
@@ -409,6 +465,8 @@ void UiManager::Update()
             screenOnTop = it;
         }
     }
+
+    // update and print all the screens
     for (auto it = screens.begin(); it != screens.end(); it++) {
         UiElement::enableMouseClick = (it == screenOnTop);
         it->second->UdpateScreen();

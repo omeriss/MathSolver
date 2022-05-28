@@ -204,6 +204,7 @@ public:
     void ChangeRecorderState(bool active);
     void AppendRoomCode(std::string code, bool restart);
     std::string& GetUsername();
+    VoiceChatSoundRecorder& GetRecorder();
 
 private:
     bool isActive;

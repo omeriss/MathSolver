@@ -264,9 +264,9 @@ std::pair<bool, double> NewtonMethod(std::map<int, double>& eq, double x, int ma
 }
 
 std::pair<int, std::pair<double, double>> QuadraticFormula(std::map<int, double>& eq) {
-	int a = (eq.find(2) == eq.end()) ? 0 : eq[2];
-	int b = (eq.find(1) == eq.end()) ? 0 : eq[1];
-	int c = (eq.find(0) == eq.end()) ? 0 : eq[0];
+	double a = (eq.find(2) == eq.end()) ? 0 : eq[2];
+	double b = (eq.find(1) == eq.end()) ? 0 : eq[1];
+	double c = (eq.find(0) == eq.end()) ? 0 : eq[0];
 	
 	if (b == 0 && c == 0 && a == 0)
 		return { -1, {0,0} };
@@ -379,14 +379,59 @@ sf::IntRect GetCombinedRect(sf::IntRect a, sf::IntRect b) {
 	return { x, y, w, h };
 }
 
-std::pair<int, pair<double, char>> GetCharFromResults(vector<pair<char, double>> nnResults, char find) {
+std::pair<int, pair<char, double>> GetCharFromResults(vector<pair<char, double>> nnResults, char find) {
 	int resLen = nnResults.size();
 	for (int i = 0; i < resLen; i++) {
 		if (nnResults[i].first == find) {
-			return { 0, nnResults[i] };
+			return { i, nnResults[i] };
 		}
 	}
 	return { -1, {-1, -1} };
+}
+
+std::string getEqString(std::vector<std::pair<sf::IntRect, double*>>& images, vector<vector<pair<char, double>>>& nnResults) {
+	std::string eq = "";
+
+	int len = images.size();
+
+	for (int i = 0; i < len; i++) {
+		if (nnResults[i][0].first == '-') {
+			int k = i;
+			std::vector<std::pair<sf::IntRect, double*>> downImages, upImages;
+			vector<vector<pair<char, double>>> downNnResults, upNnResults;
+			while (++i < len) {
+				if (images[i].first.left > images[k].first.left + images[k].first.width)
+					break;
+				if (images[i].first.top < images[k].first.top) {
+					upImages.push_back(images[i]);
+					upNnResults.push_back(nnResults[i]);
+				}
+				else {
+					downImages.push_back(images[i]);
+					downNnResults.push_back(nnResults[i]);
+				}
+			}
+			i--;
+
+			if (i == k)
+				eq += '-';
+			else {
+				eq += "(" + getEqString(upImages, upNnResults) + ")/(" + getEqString(downImages, downNnResults) + ")";
+			}
+		}
+		else {
+			eq += (nnResults[i][0].first == 'y') ? 'x' : nnResults[i][0].first;
+
+			if (i + 1 < len) {
+				if (CenterY(images[i + 1].first) < images[i].first.top &&
+					0.75 * std::max(images[i].first.width, images[i].first.height) > std::max(images[i + 1].first.width, images[i + 1].first.height)) {
+					eq += '^';
+				}
+			}
+		}
+	}
+
+	return eq;
 }
 
 void EquationAnalizer::LoadFromImages(std::vector<std::pair<sf::IntRect, double*>> images)
@@ -412,11 +457,11 @@ void EquationAnalizer::LoadFromImages(std::vector<std::pair<sf::IntRect, double*
 		}
 
 		double bestScore = 50;
-		int bestIndex = -1;
+		size_t bestIndex = -1;
 		auto lastFindRes = GetCharFromResults(nnResults[0], '-');
 		for(int i = 1; i < imageCount; i++) {
 			auto findRes = GetCharFromResults(nnResults[i], '-');
-			if (findRes.first < 2 && lastFindRes.first < 2) {
+			if (findRes.first < 4 && lastFindRes.first < 4) {
 				if (CenterX(images[i].first) >= images[i - 1].first.left && CenterX(images[i].first) <= images[i - 1].first.left + images[i - 1].first.width &&
 					CenterX(images[i - 1].first) >= images[i].first.left && CenterX(images[i - 1].first) <= images[i].first.left + images[i].first.width) {
 					double score = (findRes.first != 0) + (lastFindRes.first != 0);
@@ -434,29 +479,41 @@ void EquationAnalizer::LoadFromImages(std::vector<std::pair<sf::IntRect, double*
 		if(bestIndex == -1)
 			throw std::invalid_argument("No = sign");
 
-		for (int i = 0; i < bestIndex - 1; i++) {
-			if(bestIndex == 2)
-				leftSide += nnResults[i][0].first;
-			else
-				leftSide += (nnResults[i][0].first == 'y')? nnResults[i][1].first: nnResults[i][0].first;
-
-			if (i + 1 < bestIndex) {
-				if (CenterY(images[i + 1].first) < images[i].first.top &&
-					0.75 * std::max(images[i].first.width, images[i].first.height) > std::max(images[i + 1].first.width, images[i + 1].first.height)) {
-					leftSide += '^';
-				}
-			}
+		if (bestIndex == 2)
+			leftSide += nnResults[0][0].first;
+		else {
+			auto tempImg = std::vector(images.begin(), images.begin() + (bestIndex - 1));
+			auto tempRes = std::vector(nnResults.begin(), nnResults.begin() + (bestIndex - 1));
+			leftSide = getEqString(tempImg, tempRes);
 		}
-		for (int i = bestIndex + 1; i < imageCount; i++) {
-			rightSide += (nnResults[i][0].first == 'y') ? 'x' : nnResults[i][0].first;
 
-			if (i + 1 < imageCount) {
-				if (CenterY(images[i + 1].first) < images[i].first.top &&
-					0.75 * std::max(images[i].first.width, images[i].first.height) > std::max(images[i + 1].first.width, images[i + 1].first.height)) {
-					rightSide += '^';
-				}
-			}
-		}
+		auto tempImg = std::vector(images.begin() + (bestIndex + 1), images.end());
+		auto tempRes = std::vector(nnResults.begin() + (bestIndex + 1), nnResults.end());
+		rightSide = getEqString(tempImg, tempRes);
+
+		//for (int i = 0; i < bestIndex - 1; i++) {
+		//	if(bestIndex == 2)
+		//		leftSide += nnResults[i][0].first;
+		//	else
+		//		leftSide += (nnResults[i][0].first == 'y')? nnResults[i][1].first: nnResults[i][0].first;
+
+		//	if (i + 1 < bestIndex) {
+		//		if (CenterY(images[i + 1].first) < images[i].first.top &&
+		//			0.75 * std::max(images[i].first.width, images[i].first.height) > std::max(images[i + 1].first.width, images[i + 1].first.height)) {
+		//			leftSide += '^';
+		//		}
+		//	}
+		//}
+		//for (int i = bestIndex + 1; i < imageCount; i++) {
+		//	rightSide += (nnResults[i][0].first == 'y') ? 'x' : nnResults[i][0].first;
+
+		//	if (i + 1 < imageCount) {
+		//		if (CenterY(images[i + 1].first) < images[i].first.top &&
+		//			0.75 * std::max(images[i].first.width, images[i].first.height) > std::max(images[i + 1].first.width, images[i + 1].first.height)) {
+		//			rightSide += '^';
+		//		}
+		//	}
+		//}
 	}
 	catch(...) {
 		std::cout << "Can't solve this" << std::endl;
@@ -501,19 +558,24 @@ void EquationAnalizer::LoadFromString(std::string equation)
 
 	if (errorString == "") {
 		SwapScreens(false);
-		if (leftSide == "y") {
+		if (leftSide == "y" && this->rightSide != "") {
 			this->subScreen->GetElementByName("graph")->SetActive(true);
 			this->subScreen->GetElementByName("solText")->SetActive(false);
 			((Graph*)this->subScreen->GetElementByName("graph"))->SetFx(getPostFix(this->rightSide));
 		}
-		else if (!hasX && !hasY && this->rightSide == "") {
+		else if (!hasX && !hasY && this->rightSide == "" && this->leftSide != "") {
 			this->subScreen->GetElementByName("graph")->SetActive(false);
 			this->subScreen->GetElementByName("solText")->SetActive(true);
 		}
-		else if(!hasY) {
+		else if(!hasY && this->rightSide != "" && this->leftSide != "") {
 			this->subScreen->GetElementByName("graph")->SetActive(false);
 			this->subScreen->GetElementByName("solText")->SetActive(true);
 			((TextBox*)this->subScreen->GetElementByName("solText"))->SetString(SolveForX(this->leftSide, this->rightSide));
+		}
+		else {
+			this->subScreen->GetElementByName("graph")->SetActive(false);
+			this->subScreen->GetElementByName("solText")->SetActive(true);
+			((TextBox*)this->subScreen->GetElementByName("solText"))->SetString("Can't solve this kind of thing");
 		}
 	}
 }

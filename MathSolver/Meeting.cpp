@@ -36,6 +36,8 @@ void Meeting::SetActive(bool state)
 			GlobalFree(copyString);
 		}
 
+		((TextBox*)toolsScreen->GetElementByName("RoomCodeText"))->SetString("Room Code:\n" + roomCode);
+
 		if (sf::SoundBufferRecorder::getAvailableDevices().size() >= 1 && sf::Keyboard::isKeyPressed(sf::Keyboard::Tab)) {
 			for (auto u : sf::SoundBufferRecorder::getAvailableDevices()) {
 				std::cout << u << "\n";
@@ -164,6 +166,11 @@ void Meeting::AppendRoomCode(std::string code, bool restart)
 std::string& Meeting::GetUsername()
 {
 	return userName;
+}
+
+VoiceChatSoundRecorder& Meeting::GetRecorder()
+{
+	return voiceRecorder;
 }
 
 
